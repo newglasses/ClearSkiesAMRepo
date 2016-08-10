@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- WANT DEFAULT VALUE TO BE CURRENT LOCATION
+    <EditTextPreference
+        android:title="@string/pref_alarm_label"
+        android:key="@string/pref_alarm_key"
+        android:defaultValue="@string/pref_alarm_default"
+        android:inputType="time"
+        android:singleLine="true" />
+
+
+        android:widgetLayout="@layout/pref_reset_bd_btn"
+
+        -->
+
+    <PreferenceCategory
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:title="@string/pref_title_define_alarm" >
+
+        <Preference
+            android:key="@string/pref_time_picker_key"
+            android:title="@string/pref_time_picker_label"
+            android:summary="Summary">
+
+        </Preference>
+
+    </PreferenceCategory>
+
+
+    <PreferenceCategory
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:title="@string/pref_title_define_location" >
+
+        <ListPreference
+            android:key="@string/pref_gps_key"
+            android:title="@string/pref_gps_label"
+            android:defaultValue="-1"
+            android:entries="@array/pref_gps_list_titles"
+            android:entryValues="@array/pref_gps_list_values"
+            android:negativeButtonText="@null"
+            android:positiveButtonText="@null"
+            android:icon="@mipmap/ic_launcher"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:title="@string/pref_title_define_events" >
+
+        <CheckBoxPreference
+            android:key="@string/pref_aurora_key"
+            android:title="@string/pref_aurora_label"
+            android:defaultValue="@string/pref_aurora_default"
+            />
+
+
+        <CheckBoxPreference
+            android:key="@string/pref_ISS_key"
+            android:title="@string/pref_ISS_label"
+            android:defaultValue="@string/pref_ISS_default" />
+
+    </PreferenceCategory>
+
+    <!-- NOTE: EditTextPreference accepts EditText attributes. -->
+    <!-- NOTE: EditTextPreference's summary should be set to its value by the activity code.
+    <EditTextPreference
+        android:key="example_text"
+        android:title="@string/pref_title_display_name"
+        android:defaultValue="@string/pref_default_display_name"
+        android:selectAllOnFocus="true"
+        android:inputType="textCapWords"
+        android:capitalize="words"
+        android:singleLine="true"
+        android:maxLines="1" />
+
+    -->
+
+</PreferenceScreen>

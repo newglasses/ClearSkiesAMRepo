@@ -1,0 +1,23 @@
+<!--
+
+only one child view so make FrameLayout
+layout width and height are match_parent which means they match the dims of the FrameLayout
+the fragment_main parent is the activity_main and it matches it's layout width and height
+looking in the activity_main we see it's layout is also match_parent for widith and height
+therefore we know our listview (below) will definitely take up the full screen
+
+-->
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity$PlaceholderFragment">
+
+    <ListView
+        android:id="@+id/listview_clearskies"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:divider="@null" />
+
+</FrameLayout>
