@@ -26,6 +26,19 @@ public class ApplicationController extends Application {
     // The ArrayList of data that is shared by all of the IntentServices
     public static ArrayList<String> dataToDisplay = new ArrayList<>();
 
+    // USING THE BASE ADAPTER
+    // The ArrayList of data that is shared by all of the IntentServices
+    public static ArrayList<String> imageArray = new ArrayList<>();
+    // The ArrayList of data that is shared by all of the IntentServices
+    public static ArrayList<String> textFirstArray = new ArrayList<>();
+    // The ArrayList of data that is shared by all of the IntentServices
+    public static ArrayList<String> textSecondArray = new ArrayList<>();
+    // The ArrayList of data that is shared by all of the IntentServices
+    public static ArrayList<String> textThirdArray = new ArrayList<>();
+    // The ArrayList of data that is shared by all of the IntentServices
+    public static ArrayList<String> styleArray = new ArrayList<>();
+
+
     // Specify the columns we need for the small local database
     private static final String[] LISTVIEW_COLUMNS = {
 
@@ -71,6 +84,24 @@ public class ApplicationController extends Application {
         matrixMatrixCursor.addRow(new Object[]{0, 0, R.drawable.img1, 1470833833305L, "30", "40"});
         matrixMatrixCursor.addRow(new Object[]{1, 1, R.drawable.img1, 1470833833305L, "30", "40"});
         matrixMatrixCursor.addRow(new Object[]{1, 1, R.drawable.img1, 1470833833305L, "30", "40"});
+
+        //TRYING OUT
+        textFirstArray.add("One");
+        textFirstArray.add("One");
+        textFirstArray.add("One");
+
+        textSecondArray.add("two");
+        textSecondArray.add("two");
+        textSecondArray.add("two");
+
+        textThirdArray.add("three");
+        textThirdArray.add("three");
+        textThirdArray.add("three");
+
+        styleArray.add("0");
+        styleArray.add("0");
+        styleArray.add("1");
+
     }
 
     /**
@@ -89,11 +120,27 @@ public class ApplicationController extends Application {
         return matrixMatrixCursor;
     }
 
+    // ACCESSING EACH ARRAYLIST IN ORDER TO UPDATE
+    public synchronized ArrayList<String> getImageArray() {
+        return imageArray;
+    }
+    public synchronized ArrayList<String> getTextFirstArray() {
+        return textFirstArray;
+    }
+    public synchronized ArrayList<String> getTextSecondArray() {
+        return textSecondArray;
+    }
+    public synchronized ArrayList<String> getTextThirdArray(){
+        return textThirdArray;
+    }
+    public synchronized ArrayList<String> getStyleArray() {
+        return styleArray;
+    }
+
     /**
      * @return The dataToDisplay ArrayList, the ArrayList will be created if it is null
      */
     public synchronized ArrayList<String> getDataToDisplay() {
-
         return dataToDisplay;
     }
 

@@ -2,6 +2,7 @@ package com.example.newglasses.clearskiesam;
 
 import android.app.Activity;
 import android.app.AlarmManager;
+import android.app.Application;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -42,6 +43,8 @@ public class MainActivity extends AppCompatActivity {
     public static ArrayAdapter<String> mClearSkiesAdapter;
 
     public static MatrixCursor matrixCursor, matrixMatrixCursor;
+
+    public static CustomAdapter testBaseCustomAdapter;
 
     public static CustomListViewAdapter testCustomAdapter, testTestCustomAdapter;
 
@@ -88,6 +91,13 @@ public class MainActivity extends AppCompatActivity {
 
         WakefulIntentService.scheduleAlarms(new DailyListener(), this, false);
 
+        testBaseCustomAdapter = new CustomAdapter(this,
+                ApplicationController.getInstance().getImageArray(),
+                ApplicationController.getInstance().getTextFirstArray(),
+                ApplicationController.getInstance().getTextSecondArray(),
+                ApplicationController.getInstance().getTextThirdArray(),
+                ApplicationController.getInstance().getStyleArray());
+
         testCustomAdapter =
                 new CustomListViewAdapter(
                         this,
@@ -96,34 +106,17 @@ public class MainActivity extends AppCompatActivity {
 
         listView = (ListView) findViewById(R.id.listView);
 
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+        listView.setAdapter(testBaseCustomAdapter);
 
-                // access the data from the array adapter
-                String moreInfo = mClearSkiesAdapter.getItem(position);
-
-                /*
-                Intent intent = new Intent (thisActivity, MainActivityFragment.class)
-                        .putExtra(Intent.EXTRA_TEXT, moreInfo);
-                startActivity(intent);
-                */
-
-                // create a toast when the list item is pressed
-                Toast.makeText(thisActivity, moreInfo, Toast.LENGTH_SHORT).show();
-
-            }
-        });
-
-        listView.setAdapter(testCustomAdapter);
+        // listView.setAdapter(testCustomAdapter);
         // listView.setAdapter(testTestCustomAdapter);
 
-        ApplicationController.getInstance().getMatrixCursor().addRow(new Object[]{0, 0, R.drawable.img1, 1470833833305L, "10", "10"});
-        ApplicationController.getInstance().getMatrixCursor().addRow(new Object[]{0, 0, R.drawable.img1, 1470833833305L, "10", "20"});
-        ApplicationController.getInstance().getMatrixCursor().addRow(new Object[]{1, 1, R.drawable.img1, 1470833833305L, "10", "30"});
-        ApplicationController.getInstance().getMatrixCursor().addRow(new Object[]{1, 1, R.drawable.img1, 1470833833305L, "10", "40"});
+        // ApplicationController.getInstance().getMatrixCursor().addRow(new Object[]{0, 0, R.drawable.img1, 1470833833305L, "10", "10"});
+        // ApplicationController.getInstance().getMatrixCursor().addRow(new Object[]{0, 0, R.drawable.img1, 1470833833305L, "10", "20"});
+        // ApplicationController.getInstance().getMatrixCursor().addRow(new Object[]{1, 1, R.drawable.img1, 1470833833305L, "10", "30"});
+        // ApplicationController.getInstance().getMatrixCursor().addRow(new Object[]{1, 1, R.drawable.img1, 1470833833305L, "10", "40"});
 
-        testCustomAdapter.notifyDataSetChanged();
+        // testCustomAdapter.notifyDataSetChanged();
     }
 
     @Override

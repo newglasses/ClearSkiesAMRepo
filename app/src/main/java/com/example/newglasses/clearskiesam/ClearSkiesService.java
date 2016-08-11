@@ -402,9 +402,32 @@ public class ClearSkiesService extends IntentService {
                     Log.e(LOG_TAG, " What's is now in the dataToDisplay arraylist: " + s);
                 }
 
-            MainActivity.testCustomAdapter.changeCursor(ApplicationController.getInstance().getMatrixMatrixCursor());
+            // MainActivity.testCustomAdapter.changeCursor(ApplicationController.getInstance().getMatrixMatrixCursor());
 
-            MainActivity.testCustomAdapter.notifyDataSetChanged();
+            // MainActivity.testCustomAdapter.notifyDataSetChanged();
+
+            ApplicationController.getInstance().getTextFirstArray().clear();
+            ApplicationController.getInstance().getTextSecondArray().clear();
+            ApplicationController.getInstance().getTextThirdArray().clear();
+            ApplicationController.getInstance().getStyleArray().clear();
+
+            ApplicationController.getInstance().getTextFirstArray().add("oneAfter");
+            ApplicationController.getInstance().getTextFirstArray().add("oneAfter");
+            ApplicationController.getInstance().getTextFirstArray().add("oneAfter");
+
+            ApplicationController.getInstance().getTextSecondArray().add("twoAfter");
+            ApplicationController.getInstance().getTextSecondArray().add("twoAfter");
+            ApplicationController.getInstance().getTextSecondArray().add("twoAfter");
+
+            ApplicationController.getInstance().getTextThirdArray().add("threeAfter");
+            ApplicationController.getInstance().getTextThirdArray().add("threeAfter");
+            ApplicationController.getInstance().getTextThirdArray().add("threeAfter");
+
+            ApplicationController.getInstance().getStyleArray().add("0");
+            ApplicationController.getInstance().getStyleArray().add("1");
+            ApplicationController.getInstance().getStyleArray().add("1");
+
+            MainActivity.testBaseCustomAdapter.notifyDataSetChanged();
 
             }
 
