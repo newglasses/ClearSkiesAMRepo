@@ -80,27 +80,10 @@ public class ApplicationController extends Application {
             ApplicationController.mPlayServices = ApplicationController.PlayServices.AVAILABLE;
         }
 
-        matrixMatrixCursor.addRow(new Object[]{0, 0, R.drawable.img1, 1470833833305L, "30", "40"});
-        matrixMatrixCursor.addRow(new Object[]{0, 0, R.drawable.img1, 1470833833305L, "30", "40"});
-        matrixMatrixCursor.addRow(new Object[]{1, 1, R.drawable.img1, 1470833833305L, "30", "40"});
-        matrixMatrixCursor.addRow(new Object[]{1, 1, R.drawable.img1, 1470833833305L, "30", "40"});
-
-        //TRYING OUT
-        textFirstArray.add("One");
-        textFirstArray.add("One");
-        textFirstArray.add("One");
-
-        textSecondArray.add("two");
-        textSecondArray.add("two");
-        textSecondArray.add("two");
-
-        textThirdArray.add("three");
-        textThirdArray.add("three");
-        textThirdArray.add("three");
-
-        styleArray.add("0");
-        styleArray.add("0");
-        styleArray.add("1");
+        // matrixMatrixCursor.addRow(new Object[]{0, 0, R.drawable.img1, 1470833833305L, "30", "40"});
+        // matrixMatrixCursor.addRow(new Object[]{0, 0, R.drawable.img1, 1470833833305L, "30", "40"});
+        // matrixMatrixCursor.addRow(new Object[]{1, 1, R.drawable.img1, 1470833833305L, "30", "40"});
+        // matrixMatrixCursor.addRow(new Object[]{1, 1, R.drawable.img1, 1470833833305L, "30", "40"});
 
     }
 

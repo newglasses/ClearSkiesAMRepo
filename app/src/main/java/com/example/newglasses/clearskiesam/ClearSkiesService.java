@@ -51,10 +51,10 @@ public class ClearSkiesService extends IntentService {
     // Used to identify when the IntentServices are finished
     private static final String MAKE_NOTIFICATION = "com.example.newglasses.amclearskies.MAKE_NOTIFICATION";
 
-    // Accessing the data that is returned from the IntentServices
-    private static boolean auroraSuccess, openNotifySuccess;
-    private static String gpsData, auroraData, openNotifyData, weatherData;
+    // DATA OUTCOMES DETERMINE UPDATE OF THE UI
+    private static boolean auroraSuccess, issSuccess, weatherSuccess, outOfRange, noInternet;
 
+    private static String gpsData, auroraData, openNotifyData, weatherData;
 
     // When accessing via PreferenceManager, DefaultPrefs you get access to the one global set
     private static SharedPreferences sharedPrefs;
@@ -67,13 +67,14 @@ public class ClearSkiesService extends IntentService {
     protected void onHandleIntent(Intent intent) {
 
 
+
         /*
         sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
 
+        auroraPref = sharedPrefs.getBoolean("aurora", true);
+        issPref = sharedPrefs.getBoolean("iss", true);
         locationPref = sharedPrefs.getString("location", "pref_gps_list_titles");
         alarmPref = sharedPrefs.getString("timePicker", "summary");
-        issPref = sharedPrefs.getBoolean("iss", true);
-        auroraPref = sharedPrefs.getBoolean("aurora", true);
 
         //ApplicationController.getInstance().getDataToDisplay().clear();
         //startGPSService(this);
@@ -114,13 +115,7 @@ public class ClearSkiesService extends IntentService {
                 startGPSService(this);
             } else {
                 if (insideUK) {
-                    if (auroraPref) {
-                        startAuroraWatchService(this);
-
-                    } else if (issPref) {
-                        startOpenNotifyService(this);
-                    }
-
+                    startWeatherService(this);
                 } else {
                     // HERE I NEED TO UPDATE THE UI ACCORDINGLY
                     Log.e(LOG_TAG, "Out of Bounds - Device currently not in the UK");
@@ -144,6 +139,8 @@ public class ClearSkiesService extends IntentService {
 
         @Override
         public void onReceive(Context context, Intent intent) {
+
+
 
             Log.i(LOG_TAG, "My alarm receiver received a broadcast");
 
@@ -245,22 +242,70 @@ public class ClearSkiesService extends IntentService {
             issPref = sharedPrefs.getBoolean("iss", true);
 
             if (insideUK) {
+                startWeatherService(context);
+            } else {
+                // HERE I NEED TO UPDATE THE UI ACCORDINGLY
+                Log.e(LOG_TAG, "Out of Bounds - Device currently not in the UK");
+            }
+        }
+        public GPSRetrievedReceiver () {
+            super();
+        }
+    }
 
+    public static class WeatherDownloadReceiver extends BroadcastReceiver {
+
+        // For logging
+        private static final String LOG_TAG = ClearSkiesService.WeatherDownloadReceiver.class.getSimpleName();
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            // Dummy data
+            boolean weatherSuccess = true;
+
+            sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+            auroraPref = sharedPrefs.getBoolean("aurora", true);
+            issPref = sharedPrefs.getBoolean("iss", true);
+
+            Log.e(LOG_TAG, "My weather receiver received a broadcast");
+
+            try {
+                String weatherData = parseJSON(context, "Forecast_IO_File");
+                parseWeather(weatherData);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            if (weatherSuccess) {
                 if (auroraPref){
                     startAuroraWatchService(context);
-
-                } else if ((!auroraPref) && (issPref)) {
+                } else if (issPref) {
                     startOpenNotifyService(context);
                 }
 
             } else {
-
                 // HERE I NEED TO UPDATE THE UI ACCORDINGLY
                 Log.e(LOG_TAG, "Out of Bounds - Device currently not in the UK");
+            }
 
+
+            // create a broadcast to advise time to update the UI
+            //Broadcast an intent back to the ClearSkiesService when work is complete
+            Intent i = new Intent(UPDATE_UI);
+            context.sendBroadcast(i);
+
+            // if certain conditions are met, send broadcast to create notification
+            if (weatherSuccess) {
+
+                Intent iN = new Intent(MAKE_NOTIFICATION);
+                context.sendBroadcast(iN);
             }
         }
-        public GPSRetrievedReceiver () {
+        public WeatherDownloadReceiver () {
             super();
         }
     }
@@ -290,7 +335,12 @@ public class ClearSkiesService extends IntentService {
             } else {
 
                 if (auroraSuccess) {
-                    startWeatherService(context);
+                    Intent i = new Intent(UPDATE_UI);
+                    context.sendBroadcast(i);
+
+                    Intent iN = new Intent(MAKE_NOTIFICATION);
+                    context.sendBroadcast(iN);
+                    // startWeatherService(context);
                 } else {
                     // create a broadcast to advise time to update the UI
                     // do not need to send broadcast to create notification
@@ -326,7 +376,12 @@ public class ClearSkiesService extends IntentService {
             }
 
             if (openNotifySuccess) {
-                startWeatherService(context);
+                Intent i = new Intent(UPDATE_UI);
+                context.sendBroadcast(i);
+
+                Intent iN = new Intent(MAKE_NOTIFICATION);
+                context.sendBroadcast(iN);
+                // startWeatherService(context);
             } else {
                 // create a broadcast to advise time to update the UI
                 // do not need to send broadcast to create notification
@@ -335,47 +390,6 @@ public class ClearSkiesService extends IntentService {
             }
         }
         public OpenNotifyDownloadReceiver () {
-            super();
-        }
-    }
-
-    public static class WeatherDownloadReceiver extends BroadcastReceiver {
-
-        // For logging
-        private static final String LOG_TAG = ClearSkiesService.WeatherDownloadReceiver.class.getSimpleName();
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-
-
-            // Dummy data
-            boolean weatherSuccess = true;
-
-
-            Log.e(LOG_TAG, "My weather receiver received a broadcast");
-
-            try {
-                String weatherData = parseJSON(context, "Forecast_IO_File");
-                parseWeather(weatherData);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            // create a broadcast to advise time to update the UI
-            //Broadcast an intent back to the ClearSkiesService when work is complete
-            Intent i = new Intent(UPDATE_UI);
-            context.sendBroadcast(i);
-
-            // if certain conditions are met, send broadcast to create notification
-            if (weatherSuccess) {
-
-                Intent iN = new Intent(MAKE_NOTIFICATION);
-                context.sendBroadcast(iN);
-            }
-        }
-        public WeatherDownloadReceiver () {
             super();
         }
     }
@@ -390,26 +404,157 @@ public class ClearSkiesService extends IntentService {
         @Override
         public void onReceive(Context context, Intent intent) {
 
+
+            // Dummy data for testing
+            weatherSuccess = true;
+            auroraSuccess = true;
+            issSuccess = true;
+            outOfRange = false;
+            noInternet = false;
+
+            // LOOKING AT THE GATHERED DATA FOR LOGGING
             if (ApplicationController.getInstance().getDataToDisplay() != null) {
                 for (String s : ApplicationController.getInstance().getDataToDisplay()) {
                     Log.e(LOG_TAG, " What's in the dataToDisplay arraylist: " + s);
                 }
                 //MainActivity.mClearSkiesAdapter.clear();
             }
-
             for (String s : ApplicationController.getInstance().getDataToDisplay()) {
                     //MainActivity.mClearSkiesAdapter.add(s);
                     Log.e(LOG_TAG, " What's is now in the dataToDisplay arraylist: " + s);
                 }
 
-            // MainActivity.testCustomAdapter.changeCursor(ApplicationController.getInstance().getMatrixMatrixCursor());
+            // DEALING WITH DATA FOR UI DISPLAY
+            // CLEAR THE ARRAYLISTS
+            if (ApplicationController.getInstance().getImageArray() != null) {
+                ApplicationController.getInstance().getImageArray().clear();
+                }
+            if (ApplicationController.getInstance().getTextFirstArray() != null) {
+                ApplicationController.getInstance().getTextFirstArray().clear();
+            }
+            if (ApplicationController.getInstance().getTextSecondArray() != null) {
+                ApplicationController.getInstance().getTextSecondArray().clear();
+            }
+            if (ApplicationController.getInstance().getTextThirdArray() != null) {
+                ApplicationController.getInstance().getTextThirdArray().clear();
+            }
+            if (ApplicationController.getInstance().getStyleArray() != null) {
+                ApplicationController.getInstance().getStyleArray().clear();
+            }
 
-            // MainActivity.testCustomAdapter.notifyDataSetChanged();
+            // REPOPULATE THE ARRAYLISTS DEPENDING ON RESULTS
 
-            ApplicationController.getInstance().getTextFirstArray().clear();
-            ApplicationController.getInstance().getTextSecondArray().clear();
-            ApplicationController.getInstance().getTextThirdArray().clear();
-            ApplicationController.getInstance().getStyleArray().clear();
+            if (weatherSuccess && auroraSuccess && issSuccess) {
+
+                ApplicationController.getInstance().getTextFirstArray().add("Date");
+                ApplicationController.getInstance().getTextFirstArray().add("ISS");
+                ApplicationController.getInstance().getTextFirstArray().add("Visibility");
+                ApplicationController.getInstance().getTextFirstArray().add("Next Update");
+
+                ApplicationController.getInstance().getTextSecondArray().add("Aurora");
+                ApplicationController.getInstance().getTextSecondArray().add("Time");
+                ApplicationController.getInstance().getTextSecondArray().add("SS");
+                ApplicationController.getInstance().getTextSecondArray().add("Tomorrow");
+
+                ApplicationController.getInstance().getTextThirdArray().add("Minor Activity");
+                ApplicationController.getInstance().getTextThirdArray().add("Duration");
+                ApplicationController.getInstance().getTextThirdArray().add("SR");
+                ApplicationController.getInstance().getTextThirdArray().add("AlarmT");
+
+                ApplicationController.getInstance().getStyleArray().add("0");
+                ApplicationController.getInstance().getStyleArray().add("0");
+                ApplicationController.getInstance().getStyleArray().add("1");
+                ApplicationController.getInstance().getStyleArray().add("1");
+
+                MainActivity.testBaseCustomAdapter.notifyDataSetChanged();
+
+            } else if (weatherSuccess && auroraSuccess) {
+
+                ApplicationController.getInstance().getTextFirstArray().add("Date");
+                ApplicationController.getInstance().getTextFirstArray().add("Visibility");
+                ApplicationController.getInstance().getTextFirstArray().add("Next Update");
+
+                ApplicationController.getInstance().getTextSecondArray().add("Aurora");
+                ApplicationController.getInstance().getTextSecondArray().add("SS");
+                ApplicationController.getInstance().getTextSecondArray().add("Tomorrow");
+
+                ApplicationController.getInstance().getTextThirdArray().add("Minor Activity");
+                ApplicationController.getInstance().getTextThirdArray().add("SR");
+                ApplicationController.getInstance().getTextThirdArray().add("AlarmT");
+
+                ApplicationController.getInstance().getStyleArray().add("0");
+                ApplicationController.getInstance().getStyleArray().add("1");
+                ApplicationController.getInstance().getStyleArray().add("1");
+
+                MainActivity.testBaseCustomAdapter.notifyDataSetChanged();
+
+            } else if (weatherSuccess && issSuccess) {
+
+                ApplicationController.getInstance().getTextFirstArray().add("Date");
+                ApplicationController.getInstance().getTextFirstArray().add("Visibility");
+                ApplicationController.getInstance().getTextFirstArray().add("Next Update");
+
+                ApplicationController.getInstance().getTextFirstArray().add("ISS");
+                ApplicationController.getInstance().getTextSecondArray().add("SS");
+                ApplicationController.getInstance().getTextSecondArray().add("Tomorrow");
+
+                ApplicationController.getInstance().getTextSecondArray().add("Time");
+                ApplicationController.getInstance().getTextThirdArray().add("SR");
+                ApplicationController.getInstance().getTextThirdArray().add("AlarmT");
+
+                ApplicationController.getInstance().getStyleArray().add("0");
+                ApplicationController.getInstance().getStyleArray().add("1");
+                ApplicationController.getInstance().getStyleArray().add("1");
+
+                MainActivity.testBaseCustomAdapter.notifyDataSetChanged();
+
+            } else if (!weatherSuccess) {
+
+                ApplicationController.getInstance().getTextFirstArray().add("Date");
+                ApplicationController.getInstance().getTextFirstArray().add("Next Update");
+
+                ApplicationController.getInstance().getTextFirstArray().add("No Events");
+                ApplicationController.getInstance().getTextSecondArray().add("Tomorrow");
+
+                ApplicationController.getInstance().getTextSecondArray().add("To Declare");
+                ApplicationController.getInstance().getTextThirdArray().add("AlarmT");
+
+                ApplicationController.getInstance().getStyleArray().add("0");
+                ApplicationController.getInstance().getStyleArray().add("1");
+
+                MainActivity.testBaseCustomAdapter.notifyDataSetChanged();
+
+            } else if (outOfRange) {
+
+                ApplicationController.getInstance().getTextFirstArray().add("Date");
+                ApplicationController.getInstance().getTextFirstArray().add("Next Update");
+
+                ApplicationController.getInstance().getTextFirstArray().add("Currently");
+                ApplicationController.getInstance().getTextSecondArray().add("Tomorrow");
+
+                ApplicationController.getInstance().getTextSecondArray().add("Out of Range");
+                ApplicationController.getInstance().getTextThirdArray().add("AlarmT");
+
+                ApplicationController.getInstance().getStyleArray().add("0");
+                ApplicationController.getInstance().getStyleArray().add("1");
+
+                MainActivity.testBaseCustomAdapter.notifyDataSetChanged();
+
+            } else if (noInternet) {
+
+                ApplicationController.getInstance().getTextFirstArray().add("Date");
+
+                ApplicationController.getInstance().getTextFirstArray().add("Network Access");
+
+                ApplicationController.getInstance().getTextSecondArray().add("Required");
+
+                ApplicationController.getInstance().getStyleArray().add("0");
+                ApplicationController.getInstance().getStyleArray().add("1");
+
+                MainActivity.testBaseCustomAdapter.notifyDataSetChanged();
+            }
+
+            /* ORIGINAL: WORKS
 
             ApplicationController.getInstance().getTextFirstArray().add("oneAfter");
             ApplicationController.getInstance().getTextFirstArray().add("oneAfter");
@@ -429,6 +574,8 @@ public class ClearSkiesService extends IntentService {
 
             MainActivity.testBaseCustomAdapter.notifyDataSetChanged();
 
+            */
+
             }
 
         public UpdateUIReceiver () {
@@ -445,15 +592,15 @@ public class ClearSkiesService extends IntentService {
         @Override
         public void onReceive(Context context, Intent intent) {
 
-            String msg = ApplicationController.getInstance().getDataToDisplay().get(0);
-            String msgText = ApplicationController.getInstance().getDataToDisplay().get(1);
-            String msgText2 = ApplicationController.getInstance().getDataToDisplay().get(2);
-            String msgText3 = ApplicationController.getInstance().getDataToDisplay().get(2);
-            String msgAlert = ApplicationController.getInstance().getDataToDisplay().get(1);
+            // String msg = ApplicationController.getInstance().getDataToDisplay().get(0);
+            // String msgText = ApplicationController.getInstance().getDataToDisplay().get(1);
+            // String msgText2 = ApplicationController.getInstance().getDataToDisplay().get(2);
+            // String msgText3 = ApplicationController.getInstance().getDataToDisplay().get(2);
+            // String msgAlert = ApplicationController.getInstance().getDataToDisplay().get(1);
 
             // Create notification using dummy data
-            //ClearSkiesService.createNotification(context, "MSG" , "MSG Text", "MSG Alert");
-            ClearSkiesService.createNotification(context, msg , msgText, msgAlert);
+            ClearSkiesService.createNotification(context, "MSG" , "MSG Text", "MSG Alert");
+            // ClearSkiesService.createNotification(context, msg , msgText, msgAlert);
 
         }
         public MakeNotificationReceiver () {

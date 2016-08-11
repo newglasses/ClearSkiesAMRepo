@@ -1,93 +1,44 @@
 package com.example.newglasses.clearskiesam;
 
 import android.app.Activity;
-import android.app.AlarmManager;
-import android.app.Application;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.MatrixCursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
-import android.preference.PreferenceManager;
-import android.provider.BaseColumns;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
 
     // for logging
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
-    private static final String DETAILFRAGMENT_TAG = "DFTAG";
-    public static Calendar cal;
-
-    private boolean mTwoPane;
-
-    private SharedPreferences sharedPrefs;
-
-    public static ArrayAdapter<String> mClearSkiesAdapter;
-
-    public static MatrixCursor matrixCursor, matrixMatrixCursor;
+    // private static final String DETAILFRAGMENT_TAG = "DFTAG";
 
     public static CustomAdapter testBaseCustomAdapter;
+    public static Calendar cal;
 
-    public static CustomListViewAdapter testCustomAdapter, testTestCustomAdapter;
+    // When accessing via PreferenceManager, DefaultPrefs you get access to the one global set
+    private static SharedPreferences sharedPrefs;
 
     private Activity thisActivity;
+    private Long alarmTime;
 
     private ListView listView;
-    //  private boolean mUseEventLayout;
+    private boolean mUseEventLayout;
     // private static final String SELECTED_KEY = "selected_position";
-
-    // Specify the columns we need.
-    private static final String[] LISTVIEW_COLUMNS = {
-
-            BaseColumns._ID,
-            "icon",
-            "first",
-            "second",
-            "third"
-    };
-
-    // Specify the columns we need.
-    private static final int[] LISTVIEW_VIEWS = {
-
-            R.id.list_icon,
-            R.id.list_first,
-            R.id.list_second,
-            R.id.list_third
-    };
-
-
-    // These indices are tied to FORECAST_COLUMNS.  If FORECAST_COLUMNS changes, these
-    // must change.
-    static final int COL_ICON = 0;
-    static final int COL_FIRST = 1;
-    static final int COL_SECOND = 2;
-    static final int COL_THIRD = 3;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
-
 
         WakefulIntentService.scheduleAlarms(new DailyListener(), this, false);
 
@@ -98,25 +49,57 @@ public class MainActivity extends AppCompatActivity {
                 ApplicationController.getInstance().getTextThirdArray(),
                 ApplicationController.getInstance().getStyleArray());
 
-        testCustomAdapter =
-                new CustomListViewAdapter(
-                        this,
-                        ApplicationController.getInstance().getMatrixCursor(),
-                        false);
-
         listView = (ListView) findViewById(R.id.listView);
 
         listView.setAdapter(testBaseCustomAdapter);
 
-        // listView.setAdapter(testCustomAdapter);
-        // listView.setAdapter(testTestCustomAdapter);
+        /*
+        int hourPref = 18, minPref = 00;
 
-        // ApplicationController.getInstance().getMatrixCursor().addRow(new Object[]{0, 0, R.drawable.img1, 1470833833305L, "10", "10"});
-        // ApplicationController.getInstance().getMatrixCursor().addRow(new Object[]{0, 0, R.drawable.img1, 1470833833305L, "10", "20"});
-        // ApplicationController.getInstance().getMatrixCursor().addRow(new Object[]{1, 1, R.drawable.img1, 1470833833305L, "10", "30"});
-        // ApplicationController.getInstance().getMatrixCursor().addRow(new Object[]{1, 1, R.drawable.img1, 1470833833305L, "10", "40"});
+        // int hourPref = sharedPrefs.getInt("selectedHour", 18);
+        // int minPref = sharedPrefs.getInt("selectedMinute", 00);
 
-        // testCustomAdapter.notifyDataSetChanged();
+        cal=Calendar.getInstance();
+        cal.setTimeInMillis(System.currentTimeMillis());
+
+        cal.set(Calendar.HOUR_OF_DAY, hourPref);
+        cal.set(Calendar.MINUTE, minPref);
+        cal.set(Calendar.SECOND, 00);
+
+        Long alertTime = cal.getTimeInMillis();
+
+        Date date = new Date(alertTime);
+        DateFormat formatter = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z");
+        String dateFormatted = formatter.format(date);
+
+        Log.e(LOG_TAG, "Alarm Time: " + dateFormatted);
+
+        if (System.currentTimeMillis() < alertTime) {
+
+            //TRYING OUT
+            ApplicationController.getInstance().getTextFirstArray().add("Date");
+            ApplicationController.getInstance().getTextSecondArray().add("Next Update");
+            ApplicationController.getInstance().getTextThirdArray().add(dateFormatted);
+            ApplicationController.getInstance().getStyleArray().add("0");
+        }
+
+        */
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        // THIS IS NOT WORKING...
+        /*
+        boolean setPrefs = false;
+        if (!setPrefs) {
+            setContentView(R.layout.activity_detail);
+        } else {
+            setContentView(R.layout.activity_main);
+        }
+        */
+
     }
 
     @Override
@@ -144,24 +127,9 @@ public class MainActivity extends AppCompatActivity {
 
     // error handling saying the @Override is not necessary here
     public void onItemSelected(Uri contentUri) {
-        if (mTwoPane) {
-            // In two-pane mode, show the detail view in this activity by
-            // adding or replacing the detail fragment using a
-            // fragment transaction.
-            Bundle args = new Bundle();
-            args.putParcelable(DetailActivityFragment.DETAIL_URI, contentUri);
-
-            DetailActivityFragment fragment = new DetailActivityFragment();
-            fragment.setArguments(args);
-
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.detail_container, fragment, DETAILFRAGMENT_TAG)
-                    .commit();
-        } else {
-            Intent intent = new Intent(this, DetailActivity.class)
+            Intent intent = new Intent(this, MainActivity.class)
                     .setData(contentUri);
             startActivity(intent);
-        }
     }
 
     /*
