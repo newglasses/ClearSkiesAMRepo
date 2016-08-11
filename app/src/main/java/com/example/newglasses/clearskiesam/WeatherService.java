@@ -4,6 +4,7 @@ import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
@@ -66,7 +67,6 @@ public class WeatherService extends IntentService {
         String lat = sharedPrefs.getString("lat", "lat error");
         String lng = sharedPrefs.getString("lng", "lng error");
 
-
         final String FORECAST_BASE_URL = "https://api.forecast.io/forecast/";
 
         // when i get the other work into this project these will be defined from there
@@ -78,6 +78,7 @@ public class WeatherService extends IntentService {
 
         String apiKey = "57e606614d55dbee13c97a1736097f91/";
         String separator = ",";
+        String params = "?exclude=[currently,minutely,hourly,alerts,flags]?units=[si]&visibility:";
 
 
         StringBuilder sbForecastURL = new StringBuilder()
@@ -90,6 +91,17 @@ public class WeatherService extends IntentService {
         String forecastURL = sbForecastURL.toString();
 
         try {
+
+            /*
+            Uri builtWeatherUri = Uri.parse(forecastURL).buildUpon()
+                    .authority("?exclude=[currently,minutely,hourly,alerts,flags]?units=[si]&visibility:")
+                    .build();
+
+            URL weatherURL = new URL (builtWeatherUri.toString());
+
+            Log.e(LOG_TAG, "Built Open Notify URI: " + weatherURL);
+            */
+
             downloadFile(forecastURL);
         } catch (IOException e) {
             e.printStackTrace();

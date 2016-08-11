@@ -17,6 +17,7 @@ import android.widget.SimpleCursorAdapter;
 
 import com.android.volley.VolleyLog;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.xmlpull.v1.XmlPullParser;
@@ -53,6 +54,7 @@ public class ClearSkiesService extends IntentService {
 
     // DATA OUTCOMES DETERMINE UPDATE OF THE UI
     private static boolean auroraSuccess, issSuccess, weatherSuccess, outOfRange, noInternet;
+    private static int weatherTier;
 
     private static String gpsData, auroraData, openNotifyData, weatherData;
 
@@ -262,7 +264,7 @@ public class ClearSkiesService extends IntentService {
         public void onReceive(Context context, Intent intent) {
 
             // Dummy data
-            boolean weatherSuccess = true;
+            weatherSuccess = false;
 
             sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
 
@@ -273,7 +275,7 @@ public class ClearSkiesService extends IntentService {
 
             try {
                 String weatherData = parseJSON(context, "Forecast_IO_File");
-                parseWeather(weatherData);
+                weatherSuccess = parseWeather(weatherData, context);
             } catch (JSONException e) {
                 e.printStackTrace();
             } catch (IOException e) {
@@ -749,19 +751,74 @@ public class ClearSkiesService extends IntentService {
         return timeFinal;
     }
 
-    public static String parseWeather(String fileData) throws JSONException, IOException {
+    public static boolean parseWeather(String fileData, Context context) throws JSONException, IOException {
 
-
+        /*
         JSONObject object = new JSONObject(fileData);
         JSONObject currently = object.getJSONObject("currently");
         String summary = currently.getString("summary");
         String visibility = currently.getString("visibility");
         String weatherCombined = summary + " " + visibility;
 
-        ApplicationController.getInstance().getDataToDisplay().add(weatherCombined);
+        */
         // ApplicationController.getInstance().getMatrixCursor().addRow(new Object[]{6, 1, "Weather", "White", "Out"});
+        
+        // JSONObject satEntry = satResponse.getJSONArray("response").getJSONObject(i);
 
-        return weatherCombined;
+        JSONObject object = new JSONObject(fileData);
+        JSONObject daily = object.getJSONObject("daily");
+        JSONArray dailyForecast = daily.getJSONArray("data");
+        JSONObject todayForecast = dailyForecast.getJSONObject(1);
+
+        //UNIX TIME
+        long time = todayForecast.getLong("time");
+        long sunsetTom = todayForecast.getLong("sunsetTime");
+        long sunriseTom = todayForecast.getLong("sunriseTime");
+
+        double precipProb = todayForecast.getDouble("precipProbability");
+        double humidityProb = todayForecast.getDouble("humidity");
+        double visibilityMiles = todayForecast.getDouble("visibility");
+        double cloudCoverPercent = todayForecast.getDouble("cloudCover");
+
+        Log.e(LOG_TAG, "findings: time: "
+                + time + " sunset: " + sunsetTom + " sunrise: " + sunriseTom +
+                " precipProb: " + precipProb + " humidityProb : " + humidityProb +
+                " visibilityMiles: " + visibilityMiles + " cloudCoverPercent : " + cloudCoverPercent);
+
+        JSONObject yesterdayForecast = dailyForecast.getJSONObject(0);
+        long sunsetTonight = yesterdayForecast.getLong("sunsetTime");
+
+        // DETERMINE CLEAR SKIES
+
+        if (cloudCoverPercent <= 0.3 && precipProb <= 0.25
+                && humidityProb <= 0.8 && visibilityMiles >= 9) {
+            weatherSuccess = true;
+            weatherTier = 0;
+
+        } else if (cloudCoverPercent <= 0.5 && precipProb <= 0.5
+                && humidityProb <= 90 && visibilityMiles >= 6) {
+            weatherSuccess = true;
+            weatherTier = 1;
+
+        } else {
+            // JUST FOR NOW FOR TESTING KEEP WEATHERSUCCESS AS TRUE
+            weatherSuccess = true;
+            weatherTier = 2;
+        }
+
+        // SAVE THE INFO NEEDED IN OTHER PARTS OF THE APP IN THE SHARED PREFS
+        // SAVE SHARED PREFS BASED ON WHETHER OR NOT WEATHER IS A SUCCESS
+        // IF NOT SUCCESSFUL, ONLY REQUIRE SUNSET & SUNRISE TIMES
+        sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+        sharedPrefs.edit().putLong("sunsetTonight", sunsetTonight).apply();
+        sharedPrefs.edit().putLong("sunriseTom", sunriseTom).apply();
+        sharedPrefs.edit().putString("cloudCover", String.valueOf(cloudCoverPercent)).apply();
+        sharedPrefs.edit().putString("visibility", String.valueOf(visibilityMiles)).apply();
+        sharedPrefs.edit().putInt("weatherTier", weatherTier);
+
+        ApplicationController.getInstance().getDataToDisplay().add(String.valueOf(time));
+        return weatherSuccess;
     }
 
     public static final void beginDocument(XmlPullParser parser, String firstElementName) throws XmlPullParserException, IOException {
