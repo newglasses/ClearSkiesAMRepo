@@ -6,7 +6,8 @@
     android:layout_height="wrap_content"
     android:gravity="center_vertical"
     android:minHeight="?android:attr/listPreferredItemHeight"
-    android:orientation="horizontal">
+    android:orientation="horizontal"
+    android:background="@drawable/other_touch_selector">
 
     <FrameLayout
         android:layout_width="60dp"
@@ -16,15 +17,14 @@
             android:id="@+id/list_icon"
             android:layout_gravity="center"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@mipmap/ic_launcher"/>
+            android:layout_height="wrap_content"/>
 
     </FrameLayout>
 
     <LinearLayout
         android:layout_height="wrap_content"
         android:layout_width="0dp"
-        android:layout_weight="7"
+        android:layout_weight="5"
         android:orientation="vertical">
 
         <TextView

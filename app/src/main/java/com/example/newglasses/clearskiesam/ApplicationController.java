@@ -26,32 +26,35 @@ public class ApplicationController extends Application {
     // The ArrayList of data that is shared by all of the IntentServices
     public static ArrayList<String> dataToDisplay = new ArrayList<>();
 
-    private static String[] from = {BaseColumns._ID, "icon", "first", "second", "third"};
-    private int[] to = {R.id.list_first, R.id.list_second, R.id.list_third};
+    // Specify the columns we need for the small local database
+    private static final String[] LISTVIEW_COLUMNS = {
 
-    //public MatrixCursor cursor = new MatrixCursor(from, 5);
+            BaseColumns._ID,
+            "listType",
+            "image",
+            "textFirst",
+            "textSecond",
+            "textThird"
+    };
 
+    // The ArrayList of data that is shared by all of the IntentServices
+    public static MatrixCursor matrixCursor = new MatrixCursor(LISTVIEW_COLUMNS);
+    // The ArrayList of data that is shared by all of the IntentServices
+    public static MatrixCursor matrixMatrixCursor = new MatrixCursor(LISTVIEW_COLUMNS);
 
     public static enum PlayServices {
         NOT_CHECKED, AVAILABLE, UNAVAILABLE
     };
     public static PlayServices mPlayServices = PlayServices.NOT_CHECKED;
 
-    /**
-     * Log or request TAG
-     */
-    public static final String TAG = "VolleyPatterns";
-
-    /**
-     * Global request queue for Volley
-     */
-    private RequestQueue mRequestQueue;
-
-    /**
-     * A singleton instance of the application class for easy access in other places
-     */
+   // A singleton instance of the application class for easy access in other places
     private static ApplicationController sInstance;
 
+    //Log or request TAG
+    public static final String TAG = "VolleyPatterns";
+
+    // Global request queue for Volley - not using anymore
+    private RequestQueue mRequestQueue;
 
     @Override
     public void onCreate() {
@@ -64,7 +67,10 @@ public class ApplicationController extends Application {
             ApplicationController.mPlayServices = ApplicationController.PlayServices.AVAILABLE;
         }
 
-        addData();
+        matrixMatrixCursor.addRow(new Object[]{0, 0, R.drawable.img1, 1470833833305L, "30", "40"});
+        matrixMatrixCursor.addRow(new Object[]{0, 0, R.drawable.img1, 1470833833305L, "30", "40"});
+        matrixMatrixCursor.addRow(new Object[]{1, 1, R.drawable.img1, 1470833833305L, "30", "40"});
+        matrixMatrixCursor.addRow(new Object[]{1, 1, R.drawable.img1, 1470833833305L, "30", "40"});
     }
 
     /**
@@ -74,21 +80,13 @@ public class ApplicationController extends Application {
         return sInstance;
     }
 
-    /**
-     * @return The dataToDisplay ArrayList, the ArrayList will be created if it is null
-     */
     public synchronized MatrixCursor getMatrixCursor() {
 
-        //return cursor;
-        return null;
+        return matrixCursor;
     }
+    public synchronized MatrixCursor getMatrixMatrixCursor() {
 
-    public void addData() {
-
-        // cursor.addRow(new Object[]{0, 1, "Extra", "White", "0"});
-        // cursor.addRow(new Object[]{1, 1, "Extra", "White", "1"});
-        // cursor.addRow(new Object[]{2, 1, "Extra", "White", "2"});
-        // cursor.addRow(new Object[]{3, 1, "Extra", "White", "3"});
+        return matrixMatrixCursor;
     }
 
     /**

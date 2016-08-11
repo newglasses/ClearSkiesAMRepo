@@ -17,7 +17,10 @@ public class BackgroundService extends WakefulIntentService {
     @Override
     public void doWakefulWork(Intent intent) {
         // your code here...
-        AlarmTime alarmTime = new AlarmTime();
-        alarmTime.setAlarm(this);
+        //AlarmTime alarmTime = new AlarmTime();
+        //alarmTime.setAlarm(this);
+
+        Intent i = new Intent(BackgroundService.this, ClearSkiesService.class);
+        startService(i);
     }
 }

@@ -1,12 +1,9 @@
 package com.example.newglasses.clearskiesam;
 
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import android.text.format.Time;
 
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 
 /**
  * Created by newglasses on 03/08/2016.
@@ -17,11 +14,6 @@ public class Utility {
     // Format used for storing dates in the database.  ALso used for converting those strings
     // back into date objects for comparison/processing.
     public static final String DATE_FORMAT = "yyyyMMdd";
-
-    public static String getPreferredLocation(Context context) {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        return prefs.getString("location", "pref_gps_list_titles");
-    }
 
     /**
      * Helper method to convert the database representation of the date into something to display
@@ -37,18 +29,12 @@ public class Utility {
         // For tomorrow:  "Tomorrow"
         // For the next 5 days: "Wednesday" (just the day name)
         // For all days after that: "Mon Jun 8"
-        /* DEPRECATED
+
         Time time = new Time();
         time.setToNow();
         long currentTime = System.currentTimeMillis();
         int julianDay = Time.getJulianDay(dateInMillis, time.gmtoff);
         int currentJulianDay = Time.getJulianDay(currentTime, time.gmtoff);
-        */
-
-        Calendar calendar = Calendar.getInstance();
-        int currentJulianDay = calendar.get(Calendar.DAY_OF_YEAR);
-        calendar.setTimeInMillis(dateInMillis);
-        int julianDay = calendar.get(Calendar.DAY_OF_YEAR);
 
         // If the date we're building the String for is today's date, the format
         // is "Today, June 24"
@@ -81,18 +67,10 @@ public class Utility {
         // If the date is today, return the localized version of "Today" instead of the actual
         // day name.
 
-        Calendar calendar = Calendar.getInstance();
-        int currentJulianDay = calendar.get(Calendar.DAY_OF_YEAR);
-        calendar.setTimeInMillis(dateInMillis);
-        int julianDay = calendar.get(Calendar.DAY_OF_YEAR);
-
-        /* DEPRECATED
         Time t = new Time();
         t.setToNow();
         int julianDay = Time.getJulianDay(dateInMillis, t.gmtoff);
         int currentJulianDay = Time.getJulianDay(System.currentTimeMillis(), t.gmtoff);
-        */
-
         if (julianDay == currentJulianDay) {
             return context.getString(R.string.today);
         } else if ( julianDay == currentJulianDay +1 ) {
@@ -121,5 +99,4 @@ public class Utility {
         String monthDayString = monthDayFormat.format(dateInMillis);
         return monthDayString;
     }
-
 }

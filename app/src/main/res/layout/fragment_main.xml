@@ -13,11 +13,11 @@ therefore we know our listview (below) will definitely take up the full screen
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity$PlaceholderFragment">
-
     <ListView
-        android:id="@+id/listview_clearskies"
+        style="@style/ForecastListStyle"
+        android:id="@+id/listView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:divider="@null" />
-
 </FrameLayout>
+

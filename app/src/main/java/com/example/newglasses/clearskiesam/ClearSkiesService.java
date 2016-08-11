@@ -66,6 +66,8 @@ public class ClearSkiesService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
 
+
+        /*
         sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
 
         locationPref = sharedPrefs.getString("location", "pref_gps_list_titles");
@@ -75,6 +77,58 @@ public class ClearSkiesService extends IntentService {
 
         //ApplicationController.getInstance().getDataToDisplay().clear();
         //startGPSService(this);
+        */
+
+        // TRYING OUT
+        Log.i(LOG_TAG, "onHandleIntent() started");
+
+        //BEFORE STARTING, CLEAR EVERYTHING IN THE DATATODISPLAY ARRAYLIST
+        ApplicationController.getInstance().getDataToDisplay().clear();
+
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+        // No default pref:
+        // String locationPref = sharedPrefs.getString("location", "pref_gps_list_titles");
+
+        // Default preference is roaming
+        String locationPref = sharedPrefs.getString("location", "1");
+        Log.e(LOG_TAG, locationPref);
+
+        // Check the device coordinates are in the UK
+        boolean insideUK = sharedPrefs.getBoolean("withinBounds", false);
+        Log.e(LOG_TAG, "withinBounds:" + insideUK);
+
+        // Check event preferences
+        auroraPref = sharedPrefs.getBoolean("aurora", true);
+        issPref = sharedPrefs.getBoolean("iss", true);
+
+
+        if (locationPref.equals("1") || locationPref.equals("-1")) {
+            Log.e(LOG_TAG, "locationPref = Roaming");
+            startGPSService(this);
+
+        } else if (locationPref.equals("0")) {
+            Log.e(LOG_TAG, "locationPref = Fixed");
+            if (!insideUK) {
+                Log.e(LOG_TAG, "insideUK = false");
+                startGPSService(this);
+            } else {
+                if (insideUK) {
+                    if (auroraPref) {
+                        startAuroraWatchService(this);
+
+                    } else if (issPref) {
+                        startOpenNotifyService(this);
+                    }
+
+                } else {
+                    // HERE I NEED TO UPDATE THE UI ACCORDINGLY
+                    Log.e(LOG_TAG, "Out of Bounds - Device currently not in the UK");
+
+                }
+
+            }
+        }
     }
 
     /*
@@ -340,13 +394,18 @@ public class ClearSkiesService extends IntentService {
                 for (String s : ApplicationController.getInstance().getDataToDisplay()) {
                     Log.e(LOG_TAG, " What's in the dataToDisplay arraylist: " + s);
                 }
-                MainActivityFragment.mClearSkiesAdapter.clear();
+                //MainActivity.mClearSkiesAdapter.clear();
             }
 
             for (String s : ApplicationController.getInstance().getDataToDisplay()) {
-                    MainActivityFragment.mClearSkiesAdapter.add(s);
+                    //MainActivity.mClearSkiesAdapter.add(s);
                     Log.e(LOG_TAG, " What's is now in the dataToDisplay arraylist: " + s);
                 }
+
+            MainActivity.testCustomAdapter.changeCursor(ApplicationController.getInstance().getMatrixMatrixCursor());
+
+            MainActivity.testCustomAdapter.notifyDataSetChanged();
+
             }
 
         public UpdateUIReceiver () {

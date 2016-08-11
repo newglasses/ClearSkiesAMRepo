@@ -1,19 +1,27 @@
 package com.example.newglasses.clearskiesam;
 
+import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.MatrixCursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.preference.PreferenceManager;
+import android.provider.BaseColumns;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.Toast;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -31,34 +39,91 @@ public class MainActivity extends AppCompatActivity {
 
     private SharedPreferences sharedPrefs;
 
+    public static ArrayAdapter<String> mClearSkiesAdapter;
+
+    public static MatrixCursor matrixCursor, matrixMatrixCursor;
+
+    public static CustomListViewAdapter testCustomAdapter, testTestCustomAdapter;
+
+    private Activity thisActivity;
+
+    private ListView listView;
+    //  private boolean mUseEventLayout;
+    // private static final String SELECTED_KEY = "selected_position";
+
+    // Specify the columns we need.
+    private static final String[] LISTVIEW_COLUMNS = {
+
+            BaseColumns._ID,
+            "icon",
+            "first",
+            "second",
+            "third"
+    };
+
+    // Specify the columns we need.
+    private static final int[] LISTVIEW_VIEWS = {
+
+            R.id.list_icon,
+            R.id.list_first,
+            R.id.list_second,
+            R.id.list_third
+    };
+
+
+    // These indices are tied to FORECAST_COLUMNS.  If FORECAST_COLUMNS changes, these
+    // must change.
+    static final int COL_ICON = 0;
+    static final int COL_FIRST = 1;
+    static final int COL_SECOND = 2;
+    static final int COL_THIRD = 3;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
 
-        if (findViewById(R.id.detail_container) != null) {
-            // The detail container view will be present only in the large-screen layouts
-            // (res/layout-sw600dp). If this view is present, then the activity should be
-            // in two-pane mode.
-            mTwoPane = true;
-
-            if (savedInstanceState == null) {
-                getSupportFragmentManager().beginTransaction()
-                        .add(R.id.container, new MainActivityFragment())
-                        .commit();
-            } else {
-                mTwoPane = false;
-                getSupportActionBar().setElevation(0f);
-            }
-        }
 
         WakefulIntentService.scheduleAlarms(new DailyListener(), this, false);
 
-        // setAlarm();
+        testCustomAdapter =
+                new CustomListViewAdapter(
+                        this,
+                        ApplicationController.getInstance().getMatrixCursor(),
+                        false);
 
-        // WORKS:
-        // AlarmTime alarmTime = new AlarmTime();
-        // alarmTime.setAlarm(this);
+        listView = (ListView) findViewById(R.id.listView);
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+
+                // access the data from the array adapter
+                String moreInfo = mClearSkiesAdapter.getItem(position);
+
+                /*
+                Intent intent = new Intent (thisActivity, MainActivityFragment.class)
+                        .putExtra(Intent.EXTRA_TEXT, moreInfo);
+                startActivity(intent);
+                */
+
+                // create a toast when the list item is pressed
+                Toast.makeText(thisActivity, moreInfo, Toast.LENGTH_SHORT).show();
+
+            }
+        });
+
+        listView.setAdapter(testCustomAdapter);
+        // listView.setAdapter(testTestCustomAdapter);
+
+        ApplicationController.getInstance().getMatrixCursor().addRow(new Object[]{0, 0, R.drawable.img1, 1470833833305L, "10", "10"});
+        ApplicationController.getInstance().getMatrixCursor().addRow(new Object[]{0, 0, R.drawable.img1, 1470833833305L, "10", "20"});
+        ApplicationController.getInstance().getMatrixCursor().addRow(new Object[]{1, 1, R.drawable.img1, 1470833833305L, "10", "30"});
+        ApplicationController.getInstance().getMatrixCursor().addRow(new Object[]{1, 1, R.drawable.img1, 1470833833305L, "10", "40"});
+
+        testCustomAdapter.notifyDataSetChanged();
     }
 
     @Override

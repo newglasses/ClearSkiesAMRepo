@@ -1,3 +1,4 @@
+<!--
 <fragment xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/container"
@@ -6,3 +7,17 @@
     tools:layout="@android:layout/list_content"
     android:layout_width="match_parent"
     android:layout_height="match_parent" />
+
+    -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:tools="http://schemas.android.com/tools"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+tools:context="com.example.newglasses.clearskiesam.MainActivity">
+<ListView
+    style="@style/ForecastListStyle"
+    android:id="@+id/listView"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:divider="@null" />
+</FrameLayout>
