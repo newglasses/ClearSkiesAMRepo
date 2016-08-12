@@ -122,6 +122,13 @@
             </intent-filter>
         </receiver>
         <receiver
+            android:name=".ClearSkiesService$SettingsUpdatedReceiver"
+            android:enabled="true" >
+            <intent-filter>
+                <action android:name="com.example.newglasses.amclearskies.SETTINGS_UPDATED" />
+            </intent-filter>
+        </receiver>
+        <receiver
             android:name=".ClearSkiesService$MakeNotificationReceiver"
             android:enabled="true" >
             <intent-filter>

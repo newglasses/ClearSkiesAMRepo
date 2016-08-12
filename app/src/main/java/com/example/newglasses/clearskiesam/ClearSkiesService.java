@@ -30,8 +30,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Locale;
 
 /**
  * Created by newglasses on 02/08/2016.
@@ -48,12 +50,15 @@ public class ClearSkiesService extends IntentService {
     private static final String LOG_TAG = ClearSkiesService.class.getSimpleName();
 
     // Used to identify when the IntentServices are finished
-    private static final String UPDATE_UI = "com.example.newglasses.amclearskies.UPDATE_UI";
+    protected static final String UPDATE_UI = "com.example.newglasses.amclearskies.UPDATE_UI";
+    // Used to identify when the IntentServices are finished
+    protected static final String SETTINGS_UPDATED = "com.example.newglasses.amclearskies.SETTINGS_UPDATED";
     // Used to identify when the IntentServices are finished
     private static final String MAKE_NOTIFICATION = "com.example.newglasses.amclearskies.MAKE_NOTIFICATION";
 
     // DATA OUTCOMES DETERMINE UPDATE OF THE UI
-    private static boolean auroraSuccess, issSuccess, weatherSuccess, outOfRange, noInternet;
+    private static boolean auroraSuccess, issSuccess, weatherSuccess, outOfRange, noInternet,
+            settingsUpdated;
     private static int weatherTier;
 
     private static String gpsData, auroraData, openNotifyData, weatherData;
@@ -414,6 +419,10 @@ public class ClearSkiesService extends IntentService {
             outOfRange = false;
             noInternet = false;
 
+            sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+            settingsUpdated = sharedPrefs.getBoolean("settingsUpdated", false);
+
             // LOOKING AT THE GATHERED DATA FOR LOGGING
             if (ApplicationController.getInstance().getDataToDisplay() != null) {
                 for (String s : ApplicationController.getInstance().getDataToDisplay()) {
@@ -426,23 +435,7 @@ public class ClearSkiesService extends IntentService {
                     Log.e(LOG_TAG, " What's is now in the dataToDisplay arraylist: " + s);
                 }
 
-            // DEALING WITH DATA FOR UI DISPLAY
-            // CLEAR THE ARRAYLISTS
-            if (ApplicationController.getInstance().getImageArray() != null) {
-                ApplicationController.getInstance().getImageArray().clear();
-                }
-            if (ApplicationController.getInstance().getTextFirstArray() != null) {
-                ApplicationController.getInstance().getTextFirstArray().clear();
-            }
-            if (ApplicationController.getInstance().getTextSecondArray() != null) {
-                ApplicationController.getInstance().getTextSecondArray().clear();
-            }
-            if (ApplicationController.getInstance().getTextThirdArray() != null) {
-                ApplicationController.getInstance().getTextThirdArray().clear();
-            }
-            if (ApplicationController.getInstance().getStyleArray() != null) {
-                ApplicationController.getInstance().getStyleArray().clear();
-            }
+            Utility.clearArrayLists();
 
             // REPOPULATE THE ARRAYLISTS DEPENDING ON RESULTS
 
@@ -554,6 +547,26 @@ public class ClearSkiesService extends IntentService {
                 ApplicationController.getInstance().getStyleArray().add("1");
 
                 MainActivity.testBaseCustomAdapter.notifyDataSetChanged();
+
+            } else if (settingsUpdated) {
+
+                // Put default values in the ListView
+                ApplicationController.getInstance().getTextFirstArray().add("Date");
+                ApplicationController.getInstance().getTextFirstArray().add("NEXT UPDATE");
+
+                ApplicationController.getInstance().getTextSecondArray().add(locationPref);
+                ApplicationController.getInstance().getTextSecondArray().add("Today");
+
+                ApplicationController.getInstance().getTextThirdArray().add(alarmPref);
+                ApplicationController.getInstance().getTextThirdArray().add(alarmPref);
+
+                ApplicationController.getInstance().getStyleArray().add("0");
+                ApplicationController.getInstance().getStyleArray().add("1");
+
+                MainActivity.testBaseCustomAdapter.notifyDataSetChanged();
+
+                settingsUpdated = false;
+
             }
 
             /* ORIGINAL: WORKS
@@ -581,6 +594,58 @@ public class ClearSkiesService extends IntentService {
             }
 
         public UpdateUIReceiver () {
+            super();
+        }
+
+    }
+
+    public static class SettingsUpdatedReceiver extends BroadcastReceiver {
+
+        // For logging
+        private static final String LOG_TAG = ClearSkiesService.SettingsUpdatedReceiver.class.getSimpleName();
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+            locationPref = sharedPrefs.getString("locationPref", "Roaming");
+            alarmPref = sharedPrefs.getString("timePicker", "20:00");
+
+
+            // LOOKING AT THE GATHERED DATA FOR LOGGING
+            if (ApplicationController.getInstance().getDataToDisplay() != null) {
+                for (String s : ApplicationController.getInstance().getDataToDisplay()) {
+                    Log.e(LOG_TAG, " What's in the dataToDisplay arraylist: " + s);
+                }
+                //MainActivity.mClearSkiesAdapter.clear();
+            }
+            for (String s : ApplicationController.getInstance().getDataToDisplay()) {
+                //MainActivity.mClearSkiesAdapter.add(s);
+                Log.e(LOG_TAG, " What's is now in the dataToDisplay arraylist: " + s);
+            }
+
+            Utility.clearArrayLists();
+
+            // REPOPULATE THE ARRAYLISTS DEPENDING ON RESULTS
+
+            ApplicationController.getInstance().getTextFirstArray().add("Date");
+            ApplicationController.getInstance().getTextFirstArray().add("NEXT UPDATE");
+
+            ApplicationController.getInstance().getTextSecondArray().add(locationPref);
+            ApplicationController.getInstance().getTextSecondArray().add("Today");
+
+            ApplicationController.getInstance().getTextThirdArray().add(alarmPref);
+            ApplicationController.getInstance().getTextThirdArray().add(alarmPref);
+
+            ApplicationController.getInstance().getStyleArray().add("0");
+            ApplicationController.getInstance().getStyleArray().add("1");
+
+            MainActivity.testBaseCustomAdapter.notifyDataSetChanged();
+
+            settingsUpdated = false;
+        }
+
+        public SettingsUpdatedReceiver () {
             super();
         }
 
@@ -719,7 +784,9 @@ public class ClearSkiesService extends IntentService {
 
         ArrayList<JSONObject> passes = new ArrayList<>();
 
-        for (int i = 0; i < 4; i++) {
+        int totPasses = satResponse.getJSONObject("request").getInt("passes");
+
+        for (int i = 0; i < totPasses; i++) {
             JSONObject satEntry = satResponse.getJSONArray("response").getJSONObject(i);
             passes.add(satEntry);
         }
@@ -745,6 +812,11 @@ public class ClearSkiesService extends IntentService {
             passList.append(passes.get(i).toString() + " * ");
         }
 
+        Log.e(LOG_TAG, passList.toString());
+
+        //SimpleDateFormat df = new SimpleDateFormat("hh:mm:ss a", Locale.ENGLISH);
+        //df.format(timeFinal);
+
         ApplicationController.getInstance().getDataToDisplay().add(timeFinal);
         //ApplicationController.getInstance().getMatrixCursor().addRow(new Object[]{5, 1, "ON", "White", "Out"});
 
@@ -762,7 +834,7 @@ public class ClearSkiesService extends IntentService {
 
         */
         // ApplicationController.getInstance().getMatrixCursor().addRow(new Object[]{6, 1, "Weather", "White", "Out"});
-        
+
         // JSONObject satEntry = satResponse.getJSONArray("response").getJSONObject(i);
 
         JSONObject object = new JSONObject(fileData);

@@ -7,10 +7,13 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.View;
 import android.widget.ListView;
 
 import java.util.Calendar;
@@ -34,11 +37,15 @@ public class MainActivity extends AppCompatActivity {
     private boolean mUseEventLayout;
     // private static final String SELECTED_KEY = "selected_position";
 
+    private View topLevelLayout;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
+
+        topLevelLayout = findViewById(R.id.top_layout);
 
         WakefulIntentService.scheduleAlarms(new DailyListener(), this, false);
 
@@ -52,6 +59,10 @@ public class MainActivity extends AppCompatActivity {
         listView = (ListView) findViewById(R.id.listView);
 
         listView.setAdapter(testBaseCustomAdapter);
+
+        if (isFirstTime()) {
+            topLevelLayout.setVisibility(View.INVISIBLE);
+        }
 
         /*
         int hourPref = 18, minPref = 00;
@@ -90,16 +101,15 @@ public class MainActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
 
-        // THIS IS NOT WORKING...
+        // THIS IS WORKING...
         /*
         boolean setPrefs = false;
         if (!setPrefs) {
-            setContentView(R.layout.activity_detail);
+            setContentView(R.layout.activity_prefs);
         } else {
             setContentView(R.layout.activity_main);
         }
         */
-
     }
 
     @Override
@@ -130,6 +140,44 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(this, MainActivity.class)
                     .setData(contentUri);
             startActivity(intent);
+    }
+
+    private boolean isFirstTime() {
+
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean ranBefore = sharedPrefs.getBoolean("ranBefore", false);
+        String locationPref = sharedPrefs.getString("locationPref", "Roaming");
+        String alertTime = sharedPrefs.getString("timePicker", "20:00");
+
+        if (!ranBefore) {
+            sharedPrefs.edit().putBoolean("ranBefore", true).apply();
+            topLevelLayout.setVisibility(View.VISIBLE);
+
+            // Put default values in the ListView
+            ApplicationController.getInstance().getTextFirstArray().add("Date");
+            ApplicationController.getInstance().getTextFirstArray().add("NEXT UPDATE");
+
+            ApplicationController.getInstance().getTextSecondArray().add(locationPref);
+            ApplicationController.getInstance().getTextSecondArray().add("Today");
+
+            ApplicationController.getInstance().getTextThirdArray().add(alertTime);
+            ApplicationController.getInstance().getTextThirdArray().add(alertTime);
+
+            ApplicationController.getInstance().getStyleArray().add("0");
+            ApplicationController.getInstance().getStyleArray().add("1");
+
+            MainActivity.testBaseCustomAdapter.notifyDataSetChanged();
+
+            topLevelLayout.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View view, MotionEvent motionEvent) {
+                    startActivity(new Intent(MainActivity.this, SettingsActivity.class));
+                    topLevelLayout.setVisibility(View.INVISIBLE);
+                    return false;
+                }
+            });
+        }
+    return ranBefore;
     }
 
     /*

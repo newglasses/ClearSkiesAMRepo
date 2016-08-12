@@ -99,4 +99,25 @@ public class Utility {
         String monthDayString = monthDayFormat.format(dateInMillis);
         return monthDayString;
     }
+
+    public static void clearArrayLists() {
+
+        // DEALING WITH DATA FOR UI DISPLAY
+        // CLEAR THE ARRAYLISTS
+        if (ApplicationController.getInstance().getImageArray() != null) {
+            ApplicationController.getInstance().getImageArray().clear();
+        }
+        if (ApplicationController.getInstance().getTextFirstArray() != null) {
+            ApplicationController.getInstance().getTextFirstArray().clear();
+        }
+        if (ApplicationController.getInstance().getTextSecondArray() != null) {
+            ApplicationController.getInstance().getTextSecondArray().clear();
+        }
+        if (ApplicationController.getInstance().getTextThirdArray() != null) {
+            ApplicationController.getInstance().getTextThirdArray().clear();
+        }
+        if (ApplicationController.getInstance().getStyleArray() != null) {
+            ApplicationController.getInstance().getStyleArray().clear();
+        }
+    }
 }

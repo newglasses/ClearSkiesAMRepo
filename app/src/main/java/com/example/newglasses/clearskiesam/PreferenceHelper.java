@@ -11,7 +11,6 @@ public class PreferenceHelper {
 
     //SharedPreferences sharedPrefs;
 
-
     public static boolean getUpdateOnlyOnWifi(Context context){
 
         //PreferenceManager.getDefaultSharedPreferences(context);

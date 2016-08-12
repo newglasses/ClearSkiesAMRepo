@@ -58,11 +58,11 @@ public class SettingsActivity extends PreferenceActivity
     private int hour, minute;
     // String variable to store the selected time - I THINK THERE IS A BETTER WAY TO DO THIS ***
     private String stringHourMinute = hour + ":" + minute;
+    // int variable to store location preference
+    private int locationPref;
+    // boolean variables to store event preferences
+    private boolean iss, aurora;
 
-    // create an Editor instance of SharedPreferences to add selected time to
-    // https://guides.codepath.com/android/Storing-and-Accessing-SharedPreferences
-    // SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-    // SharedPreferences.Editor sharedPrefsEditor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,11 +83,20 @@ public class SettingsActivity extends PreferenceActivity
         // For all prefs, attach an onPreferenceChangeListener
         // so the UI summary can be updated when the preference changes
         // see the method itself (below) for the listener that it contains
-        bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_time_picker_key)));
-        bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_gps_key)));
+        if (findPreference(getString(R.string.pref_time_picker_key)).equals(null)) {
+            bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_time_picker_default)));
+        } else {
+            bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_time_picker_key)));
+        }
+
+        if (findPreference(getString(R.string.pref_gps_key)).equals(null)) {
+            bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_gps_default)));
+        } else {
+            bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_gps_key)));
+        }
+
         // bindPreferenceSummaryToValue(findPreference(get(R.string.pref_aurora_key)));
         // bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_ISS_key)));
-
 
         timePickerButton = (Preference) findPreference("timePicker");
         timePickerButton.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
@@ -174,6 +183,8 @@ public class SettingsActivity extends PreferenceActivity
             }
         }
 
+        Log.e(LOG_TAG, "Something Updated");
+
         return true;
     }
 
@@ -232,6 +243,9 @@ public class SettingsActivity extends PreferenceActivity
             sharedPrefs.edit().putInt("selectedHour", selectedHour).apply();
             sharedPrefs.edit().putInt("selectedMinute", selectedMinute).apply();
 
+            // NOTIFY LISTVIEW THAT DATA HAS CHANGED
+            MainActivity.testBaseCustomAdapter.notifyDataSetChanged();
+
             // doing this because the listener does not pick up this change to shared prefs and
             // update the prefs ui summary automatically
             // not the right fix i think, but it works
@@ -250,6 +264,11 @@ public class SettingsActivity extends PreferenceActivity
                     Toast.LENGTH_LONG).show();
 
             WakefulIntentService.scheduleAlarms(new DailyListener(), SettingsActivity.this, false);
+
+            // create a broadcast to advise time to update the UI
+            //Broadcast an intent back to the ClearSkiesService when work is complete
+            Intent i = new Intent(ClearSkiesService.SETTINGS_UPDATED);
+            sendBroadcast(i);
 
             // WORKS:
             //AlarmTime alarmTime = new AlarmTime();

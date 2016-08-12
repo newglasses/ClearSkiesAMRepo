@@ -9,15 +9,48 @@
     android:layout_height="match_parent" />
 
     -->
+
+    <!-- For startup screen define two RelativeLayouts within one FrameLayout -->
+
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
 xmlns:tools="http://schemas.android.com/tools"
 android:layout_width="match_parent"
 android:layout_height="match_parent"
 tools:context="com.example.newglasses.clearskiesam.MainActivity">
-<ListView
-    style="@style/ForecastListStyle"
-    android:id="@+id/listView"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:divider="@null" />
+
+    <RelativeLayout
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ListView
+            style="@style/ForecastListStyle"
+            android:id="@+id/listView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:divider="@null" />
+
+    </RelativeLayout>
+
+    <!--Below is the transparent layout positioned at startup -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#88666666"
+        android:id="@+id/top_layout">
+
+        <ImageView
+            android:id="@+id/ivInstruction"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:paddingTop="25dp"
+            android:layout_marginRight="15dp"
+            android:clickable="false"
+            android:paddingLeft="20dip"
+            android:scaleType="center"
+            android:src="@drawable/aurora" />
+
+    </RelativeLayout>
+
 </FrameLayout>
