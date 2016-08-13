@@ -129,6 +129,50 @@
             </intent-filter>
         </receiver>
         <receiver
+            android:name=".ClearSkiesService$NothingToDeclareReceiver"
+            android:enabled="true" >
+            <intent-filter>
+                <action android:name="com.example.newglasses.amclearskies.NOTHING_TO_DECLARE" />
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name=".ClearSkiesService$NoInternetReceiver"
+            android:enabled="true" >
+            <intent-filter>
+                <action android:name="com.example.newglasses.amclearskies.NO_INTERNET" />
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name=".ClearSkiesService$OutOfRangeReceiver"
+            android:enabled="true" >
+            <intent-filter>
+                <action android:name="com.example.newglasses.amclearskies.OUT_OF_RANGE" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
+            android:name=".ClearSkiesService$AuroraSuccessReceiver"
+            android:enabled="true" >
+            <intent-filter>
+                <action android:name="com.example.newglasses.amclearskies.AURORA" />
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name=".ClearSkiesService$AuroraIssReceiver"
+            android:enabled="true" >
+            <intent-filter>
+                <action android:name="com.example.newglasses.amclearskies.AURORA_ISS" />
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name=".ClearSkiesService$IssReceiverReceiver"
+            android:enabled="true" >
+            <intent-filter>
+                <action android:name="com.example.newglasses.amclearskies.ISS" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
             android:name=".ClearSkiesService$MakeNotificationReceiver"
             android:enabled="true" >
             <intent-filter>

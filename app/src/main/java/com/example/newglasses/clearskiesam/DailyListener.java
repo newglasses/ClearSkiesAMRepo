@@ -104,12 +104,19 @@ public class DailyListener implements WakefulIntentService.AlarmListener {
 
                 // enable receiver to schedule update when internet is available!
                 ConnectivityReceiver.enableReceiver(context);
+                // AlertFlag and update UI
+                ClearSkiesService.noInternet = true;
+                Intent i = new Intent(ClearSkiesService.NO_INTERNET);
+                context.sendBroadcast(i);
             }
         } else {
             Log.d(LOG_TAG, "We have no internet, enable ConnectivityReceiver!");
-
             // enable receiver to schedule update when internet is available!
             ConnectivityReceiver.enableReceiver(context);
+            // AlertFlag and update UI
+            ClearSkiesService.noInternet = true;
+            Intent i = new Intent(ClearSkiesService.NO_INTERNET);
+            context.sendBroadcast(i);
         }
     }
 
