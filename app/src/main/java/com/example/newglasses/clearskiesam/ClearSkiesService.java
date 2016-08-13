@@ -51,9 +51,6 @@ public class ClearSkiesService extends IntentService {
     private static final String LOG_TAG = ClearSkiesService.class.getSimpleName();
 
     // Used to identify when the IntentServices are finished
-    protected static final String UPDATE_UI =
-            "com.example.newglasses.amclearskies.UPDATE_UI";
-    // Used to identify when the IntentServices are finished
     protected static final String SETTINGS_UPDATED =
             "com.example.newglasses.amclearskies.SETTINGS_UPDATED";
     // Used to identify when the IntentServices are finished
@@ -79,9 +76,17 @@ public class ClearSkiesService extends IntentService {
             "com.example.newglasses.amclearskies.MAKE_NOTIFICATION";
 
     // DATA OUTCOMES DETERMINE UPDATE OF THE UI
-    private static boolean auroraSuccess, issSuccess, weatherSuccess, outOfRange;
+    private static boolean auroraSuccess, issSuccess, weatherSuccess;
     protected static boolean noInternet;
     private static int weatherTier;
+
+    private static String sunsetTonight;
+    private static String sunriseTom;
+    private static String cloudCover;
+    private static String visibility;
+    private static String weatherSummary;
+
+    private static String auroraForecast, issForecast;
 
     // When accessing via PreferenceManager, DefaultPrefs you get access to the one global set
     private static SharedPreferences sharedPrefs;
@@ -152,98 +157,11 @@ public class ClearSkiesService extends IntentService {
         }
     }
 
-    /*
-    ****************************************************************************
-    HERE ARE ALL THE BROADCAST RECEIVERS THAT DEAL WITH FINISHED INTENT SERVICES
-    ****************************************************************************
-    */
-
-    public static class AlarmReceiver extends BroadcastReceiver {
-
-        // For logging
-        private static final String LOG_TAG = ClearSkiesService.AlarmReceiver.class.getSimpleName();
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-
-            Log.i(LOG_TAG, "My alarm receiver received a broadcast");
-
-            /*
-            //BEFORE STARTING, CLEAR EVERYTHING IN THE DATATODISPLAY ARRAYLIST
-            ApplicationController.getInstance().getDataToDisplay().clear();
-
-            SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
-
-            // No default pref:
-            // String locationPref = sharedPrefs.getString("location", "pref_gps_list_titles");
-
-            // Default preference is roaming
-            String locationPref = sharedPrefs.getString("location", "1");
-            Log.e(LOG_TAG, locationPref);
-
-            // Check the device coordinates are in the UK
-            boolean insideUK = sharedPrefs.getBoolean("withinBounds", false);
-            Log.e(LOG_TAG, "withinBounds:" + insideUK);
-
-            // Check event preferences
-            auroraPref = sharedPrefs.getBoolean("aurora", true);
-            issPref = sharedPrefs.getBoolean("iss", true);
-
-
-            if (locationPref.equals("1") || locationPref.equals("-1")) {
-                Log.e(LOG_TAG, "locationPref = Roaming");
-                startGPSService(context);
-
-            } else if (locationPref.equals("0")) {
-                Log.e(LOG_TAG, "locationPref = Fixed");
-                if (!insideUK) {
-                    Log.e(LOG_TAG, "insideUK = false");
-                    startGPSService(context);
-                } else {
-                    if (insideUK) {
-                        if (auroraPref){
-                            startAuroraWatchService(context);
-
-                        } else if (issPref) {
-                            startOpenNotifyService(context);
-                        }
-
-                    } else {
-                        // HERE I NEED TO UPDATE THE UI ACCORDINGLY
-                        Log.e(LOG_TAG, "Out of Bounds - Device currently not in the UK");
-                        Intent i  = new Intent(UPDATE_UI);
-                        context.sendBroadcast(i);
-                    }
-                }
-                */
-                /*
-
-            } else if (locationPref.equals("-1")) {
-                Log.e(LOG_TAG, "locationPref = Default");
-                startAuroraWatchService(context);
-            } else if (auroraPref){
-                Log.e(LOG_TAG, "auroraPref = true");
-                startAuroraWatchService(context);
-
-            } else if ((!auroraPref) && (issPref)) {
-                Log.e(LOG_TAG, "auroraPref = false, issPref = true");
-                startOpenNotifyService(context);
-            }
-
-
-
-            }
-            // consider cancelling the alarm here if there are no prefs set up - and restarting it
-            // whenever prefs are updated?
-
-            */
-        }
-
-        public AlarmReceiver () {
-            super();
-        }
-
-    }
+    /***********************************************************************************************
+     ************************************************************************************************
+                    BROADCAST RECEIVERS THAT DEAL WITH THIRD-PARTY DATA SERVICES
+     ************************************************************************************************
+     ***********************************************************************************************/
 
     public static class GPSRetrievedReceiver extends BroadcastReceiver {
 
@@ -329,6 +247,9 @@ public class ClearSkiesService extends IntentService {
                 // AlertFlag already set to false for weather
                 Intent i = new Intent(NOTHING_TO_DECLARE);
                 context.sendBroadcast(i);
+
+                Intent iN = new Intent(MAKE_NOTIFICATION);
+                context.sendBroadcast(iN);
             }
 
             /*                              ** USE FOR TESTING **
@@ -444,101 +365,11 @@ public class ClearSkiesService extends IntentService {
         }
     }
 
-    public static class UpdateUIReceiver extends BroadcastReceiver {
-
-        // For logging
-        private static final String LOG_TAG = ClearSkiesService.UpdateUIReceiver.class.getSimpleName();
-
-        private static int key = 0;
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-
-
-
-            sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
-
-            weatherSuccess = sharedPrefs.getBoolean("weatherSuccess", false);
-            auroraSuccess = sharedPrefs.getBoolean("auroraSuccess", false);
-            issSuccess = sharedPrefs.getBoolean("issSuccess", false);
-            outOfRange = sharedPrefs.getBoolean("outOfRange", false);
-            // noInternet = sharedPrefs.getBoolean("noInternet", false);
-
-            alarmPref = sharedPrefs.getString("timePicker", "20:00");
-
-            Log.e(LOG_TAG, "weatherSuccess: " + weatherSuccess);
-            Log.e(LOG_TAG, "auroraSuccess: " + auroraSuccess);
-            Log.e(LOG_TAG, "issSuccess: " + issSuccess);
-            Log.e(LOG_TAG, "outOfRange: " + outOfRange);
-            Log.e(LOG_TAG, "noInternet: " + noInternet);
-
-            // Dummy data for testing
-            // weatherSuccess = false; - set up with default false unless goes through the weather & is found to be cloudy
-            // auroraSuccess = false; - set up with default false unless goes through aurora & result found
-            // issSuccess = false; - set up with default false unless goes through ISS & result found
-            // outOfRange = false; - set up with default false unless goes through the GPS & is found to be out of bounds
-            // noInternet = false; - set up with default false unless goes through the DailyListener & is found to be no connection
-
-            // LOOKING AT THE GATHERED DATA FOR LOGGING
-            if (ApplicationController.getInstance().getDataToDisplay() != null) {
-                for (String s : ApplicationController.getInstance().getDataToDisplay()) {
-                    Log.e(LOG_TAG, " What's in the dataToDisplay arraylist: " + s);
-                }
-                //MainActivity.mClearSkiesAdapter.clear();
-            }
-            for (String s : ApplicationController.getInstance().getDataToDisplay()) {
-                    //MainActivity.mClearSkiesAdapter.add(s);
-                    Log.e(LOG_TAG, " What's is now in the dataToDisplay arraylist: " + s);
-                }
-
-            Utility.clearArrayLists();
-
-            // REPOPULATE THE ARRAYLISTS DEPENDING ON RESULTS
-
-            if (weatherSuccess && auroraSuccess && issSuccess) {
-
-
-
-            } else if (weatherSuccess && auroraSuccess) {
-
-                ApplicationController.getInstance().getTextFirstArray().add("Date");
-                ApplicationController.getInstance().getTextFirstArray().add("Visibility");
-                ApplicationController.getInstance().getTextFirstArray().add("Next Update");
-
-                ApplicationController.getInstance().getTextSecondArray().add("Aurora");
-                ApplicationController.getInstance().getTextSecondArray().add("SS");
-                ApplicationController.getInstance().getTextSecondArray().add("Tomorrow");
-
-                ApplicationController.getInstance().getTextThirdArray().add("Minor Activity");
-                ApplicationController.getInstance().getTextThirdArray().add("SR");
-                ApplicationController.getInstance().getTextThirdArray().add("AlarmT");
-
-                ApplicationController.getInstance().getStyleArray().add("0");
-                ApplicationController.getInstance().getStyleArray().add("1");
-                ApplicationController.getInstance().getStyleArray().add("1");
-
-                MainActivity.testBaseCustomAdapter.notifyDataSetChanged();
-
-            } else if (!weatherSuccess && !auroraSuccess && !issSuccess && !outOfRange && !noInternet){
-
-                ApplicationController.getInstance().getTextFirstArray().add("ALL FALSE");
-
-                ApplicationController.getInstance().getTextSecondArray().add("Network Access");
-
-                ApplicationController.getInstance().getTextThirdArray().add("Required");
-
-                ApplicationController.getInstance().getStyleArray().add("0");
-                // ApplicationController.getInstance().getStyleArray().add("1");
-
-                MainActivity.testBaseCustomAdapter.notifyDataSetChanged();
-            }
-        }
-
-        public UpdateUIReceiver () {
-            super();
-        }
-
-    }
+    /***********************************************************************************************
+     ************************************************************************************************
+                        BROADCAST RECEIVERS THAT DEAL WITH UPDATING THE UI
+     ************************************************************************************************
+     ***********************************************************************************************/
 
     public static class SettingsUpdatedReceiver extends BroadcastReceiver {
 
@@ -699,36 +530,56 @@ public class ClearSkiesService extends IntentService {
             ApplicationController.getInstance().getTextFirstArray().add("Date");
             ApplicationController.getInstance().getTextFirstArray().add("Next Update");
 
-            ApplicationController.getInstance().getTextSecondArray().add("Currently");
+            ApplicationController.getInstance().getTextSecondArray().add(locationPref);
             ApplicationController.getInstance().getTextSecondArray().add("Tomorrow");
 
             ApplicationController.getInstance().getTextThirdArray().add("Out of Range");
-            ApplicationController.getInstance().getTextThirdArray().add("AlarmT");
+            ApplicationController.getInstance().getTextThirdArray().add(alarmPref);
 
             ApplicationController.getInstance().getStyleArray().add("0");
             ApplicationController.getInstance().getStyleArray().add("1");
 
             MainActivity.testBaseCustomAdapter.notifyDataSetChanged();
         }
-
         public OutOfRangeReceiver () {
             super();
         }
-
     }
 
-    public static class AuroraReceiver extends BroadcastReceiver {
+    public static class AuroraSuccessReceiver extends BroadcastReceiver {
 
         // For logging
-        private static final String LOG_TAG = ClearSkiesService.AuroraReceiver.class.getSimpleName();
+        private static final String LOG_TAG = ClearSkiesService.AuroraSuccessReceiver.class.getSimpleName();
 
         @Override
         public void onReceive(Context context, Intent intent) {
 
             sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
-            locationPref = sharedPrefs.getString("locationPref", "Roaming");
+
             alarmPref = sharedPrefs.getString("timePicker", "20:00");
 
+            long sunset = sharedPrefs.getLong("sunsetTonight", 0000L);
+            Date sunsetD = new Date(sunset);
+            DateFormat df = new SimpleDateFormat("h:mm a");
+            sunsetTonight = df.format(sunsetD);
+
+            long sunrise = sharedPrefs.getLong("sunriseTom", 0000L);
+            Date sunriseD = new Date(sunrise);
+            sunriseTom = df.format(sunriseD);
+
+            auroraForecast = sharedPrefs.getString("auroraForecast", "nothing to display");
+
+            cloudCover = sharedPrefs.getString("cloudCover", "null");
+            visibility = sharedPrefs.getString("visibility", "null");
+            weatherTier = sharedPrefs.getInt("weatherTier", weatherTier);
+
+            if (weatherTier == 0) {
+                weatherSummary = "Clear Skies Likely";
+            } else if (weatherTier == 1) {
+                weatherSummary = "Clear Skies Possible";
+            } else {
+                weatherSummary = "Error";
+            }
 
             // LOOKING AT THE GATHERED DATA FOR LOGGING
             if (ApplicationController.getInstance().getDataToDisplay() != null) {
@@ -742,16 +593,16 @@ public class ClearSkiesService extends IntentService {
             // REPOPULATE THE ARRAYLISTS DEPENDING ON RESULTS
 
             ApplicationController.getInstance().getTextFirstArray().add("Date");
-            ApplicationController.getInstance().getTextFirstArray().add("Visibility");
+            ApplicationController.getInstance().getTextFirstArray().add(weatherSummary);
             ApplicationController.getInstance().getTextFirstArray().add("Next Update");
 
             ApplicationController.getInstance().getTextSecondArray().add("Aurora");
-            ApplicationController.getInstance().getTextSecondArray().add("SS");
+            ApplicationController.getInstance().getTextSecondArray().add(sunsetTonight);
             ApplicationController.getInstance().getTextSecondArray().add("Tomorrow");
 
-            ApplicationController.getInstance().getTextThirdArray().add("Minor Activity");
-            ApplicationController.getInstance().getTextThirdArray().add("SR");
-            ApplicationController.getInstance().getTextThirdArray().add("AlarmT");
+            ApplicationController.getInstance().getTextThirdArray().add(auroraForecast);
+            ApplicationController.getInstance().getTextThirdArray().add(sunriseTom);
+            ApplicationController.getInstance().getTextThirdArray().add(alarmPref);
 
             ApplicationController.getInstance().getStyleArray().add("0");
             ApplicationController.getInstance().getStyleArray().add("1");
@@ -760,18 +611,15 @@ public class ClearSkiesService extends IntentService {
             MainActivity.testBaseCustomAdapter.notifyDataSetChanged();
         }
 
-        public AuroraReceiver () {
+        public AuroraSuccessReceiver () {
             super();
         }
-
     }
 
-
-
-    public static class IssReceiver extends BroadcastReceiver {
+    public static class IssSuccessReceiver extends BroadcastReceiver {
 
         // For logging
-        private static final String LOG_TAG = ClearSkiesService.IssReceiver.class.getSimpleName();
+        private static final String LOG_TAG = ClearSkiesService.IssSuccessReceiver.class.getSimpleName();
 
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -779,6 +627,30 @@ public class ClearSkiesService extends IntentService {
             sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
             locationPref = sharedPrefs.getString("locationPref", "Roaming");
             alarmPref = sharedPrefs.getString("timePicker", "20:00");
+
+            long sunset = sharedPrefs.getLong("sunsetTonight", 0000L);
+            Date sunsetD = new Date(sunset);
+            DateFormat df = new SimpleDateFormat("h:mm a");
+            sunsetTonight = df.format(sunsetD);
+
+            long sunrise = sharedPrefs.getLong("sunriseTom", 0000L);
+            Date sunriseD = new Date(sunrise);
+            sunriseTom = df.format(sunriseD);
+
+            long onForecast = sharedPrefs.getLong("onForecast", 0000L);
+            Date onForecastD = new Date(onForecast);
+            issForecast = df.format(onForecastD);
+
+
+            weatherTier = sharedPrefs.getInt("weatherTier", weatherTier);
+
+            if (weatherTier == 0) {
+                weatherSummary = "Clear Skies Likely";
+            } else if (weatherTier == 1) {
+                weatherSummary = "Clear Skies Possible";
+            } else {
+                weatherSummary = "Error";
+            }
 
 
             // LOOKING AT THE GATHERED DATA FOR LOGGING
@@ -793,16 +665,16 @@ public class ClearSkiesService extends IntentService {
             // REPOPULATE THE ARRAYLISTS DEPENDING ON RESULTS
 
             ApplicationController.getInstance().getTextFirstArray().add("Date");
-            ApplicationController.getInstance().getTextFirstArray().add("Visibility");
+            ApplicationController.getInstance().getTextFirstArray().add(weatherSummary);
             ApplicationController.getInstance().getTextFirstArray().add("Next Update");
 
             ApplicationController.getInstance().getTextSecondArray().add("ISS");
-            ApplicationController.getInstance().getTextSecondArray().add("SS");
+            ApplicationController.getInstance().getTextSecondArray().add(sunsetTonight);
             ApplicationController.getInstance().getTextSecondArray().add("Tomorrow");
 
-            ApplicationController.getInstance().getTextThirdArray().add("Time");
-            ApplicationController.getInstance().getTextThirdArray().add("SR");
-            ApplicationController.getInstance().getTextThirdArray().add("AlarmT");
+            ApplicationController.getInstance().getTextThirdArray().add(issForecast);
+            ApplicationController.getInstance().getTextThirdArray().add(sunriseTom);
+            ApplicationController.getInstance().getTextThirdArray().add(alarmPref);
 
             ApplicationController.getInstance().getStyleArray().add("0");
             ApplicationController.getInstance().getStyleArray().add("1");
@@ -811,7 +683,7 @@ public class ClearSkiesService extends IntentService {
             MainActivity.testBaseCustomAdapter.notifyDataSetChanged();
         }
 
-        public IssReceiver () {
+        public IssSuccessReceiver () {
             super();
         }
 
@@ -829,6 +701,31 @@ public class ClearSkiesService extends IntentService {
             locationPref = sharedPrefs.getString("locationPref", "Roaming");
             alarmPref = sharedPrefs.getString("timePicker", "20:00");
 
+            auroraForecast = sharedPrefs.getString("auroraForecast", "nothing to display");
+
+            long sunset = sharedPrefs.getLong("sunsetTonight", 0000L);
+            Date sunsetD = new Date(sunset);
+            DateFormat df = new SimpleDateFormat("h:mm a");
+            sunsetTonight = df.format(sunsetD);
+
+            long sunrise = sharedPrefs.getLong("sunriseTom", 0000L);
+            Date sunriseD = new Date(sunrise);
+            sunriseTom = df.format(sunriseD);
+
+            long onForecast = sharedPrefs.getLong("onForecast", 0000L);
+            Date onForecastD = new Date(onForecast);
+            issForecast = df.format(onForecastD);
+
+
+            weatherTier = sharedPrefs.getInt("weatherTier", weatherTier);
+
+            if (weatherTier == 0) {
+                weatherSummary = "Clear Skies Likely";
+            } else if (weatherTier == 1) {
+                weatherSummary = "Clear Skies Possible";
+            } else {
+                weatherSummary = "Error";
+            }
 
             // LOOKING AT THE GATHERED DATA FOR LOGGING
             if (ApplicationController.getInstance().getDataToDisplay() != null) {
@@ -843,18 +740,18 @@ public class ClearSkiesService extends IntentService {
 
             ApplicationController.getInstance().getTextFirstArray().add("Date");
             ApplicationController.getInstance().getTextFirstArray().add("ISS");
-            ApplicationController.getInstance().getTextFirstArray().add("Visibility");
+            ApplicationController.getInstance().getTextFirstArray().add(weatherSummary);
             ApplicationController.getInstance().getTextFirstArray().add("Next Update");
 
             ApplicationController.getInstance().getTextSecondArray().add("Aurora");
-            ApplicationController.getInstance().getTextSecondArray().add("Time");
-            ApplicationController.getInstance().getTextSecondArray().add("SS");
+            ApplicationController.getInstance().getTextSecondArray().add("");
+            ApplicationController.getInstance().getTextSecondArray().add(sunsetTonight);
             ApplicationController.getInstance().getTextSecondArray().add("Tomorrow");
 
-            ApplicationController.getInstance().getTextThirdArray().add("Minor Activity");
-            ApplicationController.getInstance().getTextThirdArray().add("Duration");
-            ApplicationController.getInstance().getTextThirdArray().add("SR");
-            ApplicationController.getInstance().getTextThirdArray().add("AlarmT");
+            ApplicationController.getInstance().getTextThirdArray().add(auroraForecast);
+            ApplicationController.getInstance().getTextThirdArray().add(issForecast);
+            ApplicationController.getInstance().getTextThirdArray().add(sunriseTom);
+            ApplicationController.getInstance().getTextThirdArray().add(alarmPref);
 
             ApplicationController.getInstance().getStyleArray().add("0");
             ApplicationController.getInstance().getStyleArray().add("0");
@@ -870,6 +767,12 @@ public class ClearSkiesService extends IntentService {
 
     }
 
+    /***********************************************************************************************
+     ************************************************************************************************
+                            BROADCAST RECEIVER THAT RAISES THE NOTIFICATION
+     ************************************************************************************************
+     ***********************************************************************************************/
+
     public static class MakeNotificationReceiver extends BroadcastReceiver {
 
         // For logging
@@ -878,15 +781,22 @@ public class ClearSkiesService extends IntentService {
         @Override
         public void onReceive(Context context, Intent intent) {
 
-            // String msg = ApplicationController.getInstance().getDataToDisplay().get(0);
-            // String msgText = ApplicationController.getInstance().getDataToDisplay().get(1);
-            // String msgText2 = ApplicationController.getInstance().getDataToDisplay().get(2);
-            // String msgText3 = ApplicationController.getInstance().getDataToDisplay().get(2);
-            // String msgAlert = ApplicationController.getInstance().getDataToDisplay().get(1);
+            String msg = "Clear Skies Tonight!";
+
+            String msgText;
+
+            if (auroraSuccess == true && issSuccess == true) {
+                msgText = "Aurora, ISS";
+            } else if (auroraSuccess) {
+                msgText = "Aurora";
+            } else {
+                msgText = "ISS";
+            }
+            // For accessibility services
+            String msgAlert = "Clear Skies Tonight!";
 
             // Create notification using dummy data
-            ClearSkiesService.createNotification(context, "MSG" , "MSG Text", "MSG Alert");
-            // ClearSkiesService.createNotification(context, msg , msgText, msgAlert);
+            ClearSkiesService.createNotification(context, msg , msgText, msgAlert);
 
         }
         public MakeNotificationReceiver () {
@@ -896,7 +806,7 @@ public class ClearSkiesService extends IntentService {
 
     /***********************************************************************************************
     ************************************************************************************************
-                                    PARSING THE DOWNLOADED DATA
+                                    PARSING AND TESTING THE DOWNLOADED DATA
     ************************************************************************************************
     ***********************************************************************************************/
 
@@ -1155,7 +1065,7 @@ public class ClearSkiesService extends IntentService {
             weatherTier = 0;
 
         } else if (cloudCoverPercent <= 0.5 && precipProb <= 0.5
-                && humidityProb <= 90 && visibilityMiles >= 6) {
+                && humidityProb <= 0.9 && visibilityMiles >= 6) {
             weatherSuccess = true;
             weatherTier = 1;
 
@@ -1225,6 +1135,8 @@ public class ClearSkiesService extends IntentService {
         // Define an Intent and an action to perform with it by another application
         PendingIntent notificIntent = PendingIntent.getActivity(context, 0,
                 new Intent(context, MainActivity.class), 0);
+
+
 
         // Builds a notification
         NotificationCompat.Builder mBuilder =

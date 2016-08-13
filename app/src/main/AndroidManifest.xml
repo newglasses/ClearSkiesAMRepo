@@ -32,6 +32,7 @@
 
         <activity
             android:name=".MainActivity"
+            android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:label="@string/app_name" >
             <intent-filter>
@@ -83,10 +84,6 @@
         <!-- Declare each Inner Class BroadcastReceiver and it's filters -->
 
         <receiver
-            android:name=".ClearSkiesService$AlarmReceiver"
-            android:enabled="true" >
-        </receiver>
-        <receiver
             android:name=".ClearSkiesService$GPSRetrievedReceiver"
             android:enabled="true" >
             <intent-filter>
@@ -112,13 +109,6 @@
             android:enabled="true" >
             <intent-filter>
                 <action android:name="com.example.newglasses.amclearskies.WEATHER_DONE" />
-            </intent-filter>
-        </receiver>
-        <receiver
-            android:name=".ClearSkiesService$UpdateUIReceiver"
-            android:enabled="true" >
-            <intent-filter>
-                <action android:name="com.example.newglasses.amclearskies.UPDATE_UI" />
             </intent-filter>
         </receiver>
         <receiver
@@ -165,7 +155,7 @@
             </intent-filter>
         </receiver>
         <receiver
-            android:name=".ClearSkiesService$IssReceiverReceiver"
+            android:name=".ClearSkiesService$IssSuccessReceiver"
             android:enabled="true" >
             <intent-filter>
                 <action android:name="com.example.newglasses.amclearskies.ISS" />

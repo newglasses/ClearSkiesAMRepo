@@ -57,7 +57,7 @@ public class AlarmTime {
 
 
         // Define our intention of executing the ClearSkiesService class
-        Intent alertIntent = new Intent(context, ClearSkiesService.AlarmReceiver.class);
+        //Intent alertIntent = new Intent(context, ClearSkiesService.AlarmReceiver.class);
 
         // Allows you to schedule for your application to do something at a later date
         // even if it is in the background or isn't active
@@ -78,14 +78,14 @@ public class AlarmTime {
                 1000 * 60, PendingIntent.getBroadcast(this, 1, alertIntent,
                         PendingIntent.FLAG_UPDATE_CURRENT));
 
-        */
+
 
         alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, alertTime, AlarmManager.INTERVAL_FIFTEEN_MINUTES,
                 PendingIntent.getBroadcast(context, 1, alertIntent,
                         PendingIntent.FLAG_UPDATE_CURRENT));
 
 
-
+        */
         /*
 
         // With setInexactRepeating(), you have to use one of the AlarmManager interval
