@@ -26,7 +26,7 @@
         <Preference
             android:key="@string/pref_time_picker_key"
             android:title="@string/pref_time_picker_label"
-            android:summary="Summary">
+            android:summary="@string/pref_time_picker_default">
 
         </Preference>
 
@@ -64,6 +64,18 @@
             android:key="@string/pref_ISS_key"
             android:title="@string/pref_ISS_label"
             android:defaultValue="@string/pref_ISS_default" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:title="@string/pref_title_define_other" >
+
+        <Preference
+            android:key="@string/pref_cancel_key"
+            android:title="@string/pref_cancel_label">
+
+        </Preference>
 
     </PreferenceCategory>
 

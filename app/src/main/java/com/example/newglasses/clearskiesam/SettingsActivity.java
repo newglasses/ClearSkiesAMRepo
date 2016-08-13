@@ -51,6 +51,8 @@ public class SettingsActivity extends PreferenceActivity
     private Preference timePickerButton;
     private TimePickerDialog timePickerDialog;
 
+    private Preference cancelClearSkies;
+
     // Create instance of calendar to access current device time
     private Calendar dateAndTime = Calendar.getInstance();
 
@@ -95,9 +97,8 @@ public class SettingsActivity extends PreferenceActivity
             bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_gps_key)));
         }
 
-        // bindPreferenceSummaryToValue(findPreference(get(R.string.pref_aurora_key)));
-        // bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_ISS_key)));
 
+        // When the Alarm button is clicked the TimePickerDialog is raised
         timePickerButton = (Preference) findPreference("timePicker");
         timePickerButton.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
 
@@ -108,7 +109,19 @@ public class SettingsActivity extends PreferenceActivity
             }
         });
 
+        // When the cancel button is clicked the ClearSkies background work is cancelled
+        cancelClearSkies = (Preference) findPreference("cancel");
+        cancelClearSkies.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
 
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+
+                Toast.makeText(SettingsActivity.this,
+                        "Cancel Clear Skies service option to be implemented",
+                        Toast.LENGTH_LONG).show();
+                return false;
+            }
+        });
     }
 
     /**

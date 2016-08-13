@@ -18,6 +18,7 @@
     <string name="pref_title_define_alarm">When</string>
     <string name="pref_title_define_location">Where</string>
     <string name="pref_title_define_events">What</string>
+    <string name="pref_title_define_other">Other</string>
 
     <string-array name="pref_gps_list_titles">
         <item>Fix to current</item>

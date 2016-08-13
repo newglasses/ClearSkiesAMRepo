@@ -24,6 +24,9 @@
     <string name="pref_ISS_key" translatable="false">iss</string>
     <string name="pref_ISS_default">true</string>
 
+    <string name="pref_cancel_key">cancel</string>
+    <string name="pref_cancel_label">Cancel Clear Skies Service</string>
+
     <!-- Date label when displaying today's weather forecast [CHAR LIMIT=20] -->
     <string name="today">Today</string>
 

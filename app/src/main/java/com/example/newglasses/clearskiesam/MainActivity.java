@@ -132,6 +132,13 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
 
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_refresh) {
+            WakefulIntentService.scheduleAlarms(new DailyListener(), MainActivity.this, false);
+            //startActivity(new Intent(this, MainActivity.class));
+            return true;
+        }
+
         return super.onOptionsItemSelected(item);
     }
 

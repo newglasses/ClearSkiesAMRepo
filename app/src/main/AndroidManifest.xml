@@ -8,9 +8,9 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <!-- Permission to access coarse (non-gps) device location data -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <!-- uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" /-->
     <!-- Permission to Send SMS -->
-    <uses-permission android:name="android.permission.SEND_SMS" />
+    <!--uses-permission android:name="android.permission.SEND_SMS" /-->
     <!-- ActivityManager -->
     <uses-permission android:name="android.permission.INTERACT_ACROSS_USERS_FULL" />
     <!-- Is there internet connection -->
