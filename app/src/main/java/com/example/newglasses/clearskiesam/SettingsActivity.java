@@ -18,12 +18,15 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
 import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
+import android.widget.Toolbar;
 
 import java.util.Calendar;
 
@@ -72,7 +75,9 @@ public class SettingsActivity extends PreferenceActivity
 
         sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
 
-        // setupActionBar();
+        //Toolbar toolbar = (Toolbar) LayoutInflater.from(this).inflate(R.layout.settings_toolbar);
+
+        //setupActionBar();
 
         // Even though this method is deprecated it is still the best to use
         // because we are targetting devices as early as Gingerbread
