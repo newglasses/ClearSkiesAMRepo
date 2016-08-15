@@ -16,6 +16,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.util.Calendar;
@@ -24,7 +25,6 @@ public class MainActivity extends AppCompatActivity {
 
     // for logging
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
-    // private static final String DETAILFRAGMENT_TAG = "DFTAG";
 
     public static CustomAdapter testBaseCustomAdapter;
     public static Calendar cal;
@@ -42,6 +42,8 @@ public class MainActivity extends AppCompatActivity {
 
     private View topLevelLayout;
 
+    protected static ProgressBar progressBar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,7 +54,11 @@ public class MainActivity extends AppCompatActivity {
 
         dateView = (TextView) findViewById(R.id.list_date);
 
+        progressBar = (ProgressBar) findViewById(R.id.progress_bar);
+
         dateView.setText(Utility.getFriendlyDayString(this, System.currentTimeMillis()));
+
+        progressBar.setVisibility(View.GONE);
 
         WakefulIntentService.scheduleAlarms(new DailyListener(), this, false);
 
@@ -72,53 +78,11 @@ public class MainActivity extends AppCompatActivity {
         if (isFirstTime()) {
             topLevelLayout.setVisibility(View.INVISIBLE);
         }
-
-        /*
-        int hourPref = 18, minPref = 00;
-
-        // int hourPref = sharedPrefs.getInt("selectedHour", 18);
-        // int minPref = sharedPrefs.getInt("selectedMinute", 00);
-
-        cal=Calendar.getInstance();
-        cal.setTimeInMillis(System.currentTimeMillis());
-
-        cal.set(Calendar.HOUR_OF_DAY, hourPref);
-        cal.set(Calendar.MINUTE, minPref);
-        cal.set(Calendar.SECOND, 00);
-
-        Long alertTime = cal.getTimeInMillis();
-
-        Date date = new Date(alertTime);
-        DateFormat formatter = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z");
-        String dateFormatted = formatter.format(date);
-
-        Log.e(LOG_TAG, "Alarm Time: " + dateFormatted);
-
-        if (System.currentTimeMillis() < alertTime) {
-
-            //TRYING OUT
-            ApplicationController.getInstance().getTextFirstArray().add("Date");
-            ApplicationController.getInstance().getTextSecondArray().add("Next Update");
-            ApplicationController.getInstance().getTextThirdArray().add(dateFormatted);
-            ApplicationController.getInstance().getStyleArray().add("0");
-        }
-
-        */
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-
-        // THIS IS WORKING...
-        /*
-        boolean setPrefs = false;
-        if (!setPrefs) {
-            setContentView(R.layout.activity_prefs);
-        } else {
-            setContentView(R.layout.activity_main);
-        }
-        */
     }
 
     @Override
@@ -159,6 +123,10 @@ public class MainActivity extends AppCompatActivity {
                     .setData(contentUri);
             startActivity(intent);
     }
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
 
     private boolean isFirstTime() {
 
@@ -166,6 +134,25 @@ public class MainActivity extends AppCompatActivity {
         boolean ranBefore = sharedPrefs.getBoolean("ranBefore", false);
         String locationPref = sharedPrefs.getString("locationPref", "Roaming");
         String alertTime = sharedPrefs.getString("timePicker", "20:00");
+
+        int hourPref = sharedPrefs.getInt("selectedHour", 20);
+        int minPref = sharedPrefs.getInt("selectedMinute", 00);
+
+
+        String nextUpdate;
+
+        Calendar cal=Calendar.getInstance();
+        cal.setTimeInMillis(System.currentTimeMillis());
+
+        cal.set(Calendar.HOUR_OF_DAY, hourPref);
+        cal.set(Calendar.MINUTE, minPref);
+        cal.set(Calendar.SECOND, 00);
+
+        if(cal.getTimeInMillis() < System.currentTimeMillis()) {
+            nextUpdate = "Tomorrow";
+        } else {
+            nextUpdate = "Today";
+        }
 
         if (!ranBefore) {
             sharedPrefs.edit().putBoolean("ranBefore", true).apply();
@@ -176,7 +163,7 @@ public class MainActivity extends AppCompatActivity {
             ApplicationController.getInstance().getTextFirstArray().add("NEXT UPDATE");
 
             ApplicationController.getInstance().getTextSecondArray().add(locationPref);
-            ApplicationController.getInstance().getTextSecondArray().add("Today");
+            ApplicationController.getInstance().getTextSecondArray().add(nextUpdate);
 
             ApplicationController.getInstance().getTextThirdArray().add(alertTime);
             ApplicationController.getInstance().getTextThirdArray().add(alertTime);
@@ -194,95 +181,17 @@ public class MainActivity extends AppCompatActivity {
                     return false;
                 }
             });
+
+        } else {
+
+            ApplicationController.getInstance().getTextFirstArray().add("NEXT UPDATE");
+
+            ApplicationController.getInstance().getTextSecondArray().add(nextUpdate);
+
+            ApplicationController.getInstance().getTextThirdArray().add(alertTime);
+
+            ApplicationController.getInstance().getStyleArray().add("0");
         }
     return ranBefore;
     }
-
-    /*
-
-    public void setAlarm() {
-
-        Log.e(LOG_TAG, "Inside the setAlarm()");
-
-        sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-        int hourPref = sharedPrefs.getInt("selectedHour", 18);
-        int minPref = sharedPrefs.getInt("selectedMinute", 00);
-
-        cal=Calendar.getInstance();
-        cal.setTimeInMillis(System.currentTimeMillis());
-
-        //cal.set(Calendar.MONTH,6);
-        //cal.set(Calendar.YEAR,2011);
-        //cal.set(Calendar.DAY_OF_MONTH,29);
-        cal.set(Calendar.HOUR_OF_DAY, hourPref);
-        cal.set(Calendar.MINUTE, minPref);
-        cal.set(Calendar.SECOND, 00);
-
-        // Define a time value of 5 seconds
-        // THIS WORKS: Long alertTime = new GregorianCalendar().getTimeInMillis()+5*1000;
-        // Long intervalTime = Long.valueOf(5000);
-        Long alertTime = cal.getTimeInMillis();
-
-        Date date = new Date(alertTime);
-        DateFormat formatter = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z");
-        String dateFormatted = formatter.format(date);
-
-        Log.e(LOG_TAG, "Alarm Time: " + dateFormatted);
-
-
-        // Define our intention of executing the ClearSkiesService class
-        Intent alertIntent = new Intent(this, ClearSkiesService.AlarmReceiver.class);
-
-        // Allows you to schedule for your application to do something at a later date
-        // even if it is in the background or isn't active
-        AlarmManager alarmManager = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
-
-        // set() schedules an alarm to trigger
-        // Trigger for alertIntent to fire in 5 seconds
-        // FLAG_UPDATE_CURRENT : Update the Intent if active (don't start a new one)
-        /* WORKS:
-        alarmManager.set(AlarmManager.RTC_WAKEUP, alertTime,
-                PendingIntent.getBroadcast(this, 1, alertIntent,
-                        PendingIntent.FLAG_UPDATE_CURRENT));
-
-        /*
-        // Starts the alarm at the time request, and repeats it every minute
-        // GOOD FOR TESTING - EXAMPLE USER TURNING THE ALARM OFF
-        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, alertTime,
-                1000 * 60, PendingIntent.getBroadcast(this, 1, alertIntent,
-                        PendingIntent.FLAG_UPDATE_CURRENT));
-
-
-
-        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, alertTime, AlarmManager.INTERVAL_FIFTEEN_MINUTES,
-        PendingIntent.getBroadcast(this, 1, alertIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT));
-
-
-
-        /*
-
-        // With setInexactRepeating(), you have to use one of the AlarmManager interval
-        // constants--in this case, AlarmManager.INTERVAL_DAY.
-        // PREFERRED BY ANDROID - SEE ANDROID DOCUMENATION FOR RATIONALE
-        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, alertTime,
-                AlarmManager.INTERVAL_DAY, PendingIntent.getBroadcast(this, 1, alertIntent,
-                        PendingIntent.FLAG_UPDATE_CURRENT));
-
-
-    }
-
-    */
-
-    public boolean isNetworkAvailable() {
-        ConnectivityManager cm = (ConnectivityManager)
-                getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = cm.getActiveNetworkInfo();
-        // if no network is available networkInfo will be null
-        // otherwise check if we are connected
-        if (networkInfo != null && networkInfo.isConnected()) {
-            return true;
-        }
-        return false;
-    } // CODE TAKEN FROM HERE: http://www.vogella.com/tutorials/AndroidNetworking/article.html
 }

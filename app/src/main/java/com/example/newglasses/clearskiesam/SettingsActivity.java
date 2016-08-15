@@ -75,10 +75,6 @@ public class SettingsActivity extends PreferenceActivity
 
         sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
 
-        //Toolbar toolbar = (Toolbar) LayoutInflater.from(this).inflate(R.layout.settings_toolbar);
-
-        //setupActionBar();
-
         // Even though this method is deprecated it is still the best to use
         // because we are targetting devices as early as Gingerbread
         // taken from Android course

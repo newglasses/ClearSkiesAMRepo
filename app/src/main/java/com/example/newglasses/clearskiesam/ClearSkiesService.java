@@ -11,6 +11,7 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import android.view.View;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -30,6 +31,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+
+import static android.view.View.*;
+
 /**
  * Created by newglasses on 02/08/2016.
  * The ClearSkiesService manages the background work required for the application
@@ -94,6 +98,8 @@ public class ClearSkiesService extends IntentService {
     protected void onHandleIntent(Intent intent) {
 
         Log.i(LOG_TAG, "onHandleIntent() ClearSkiesService started");
+
+        //MainActivity.progressBar.setVisibility(View.VISIBLE);
 
         //BEFORE STARTING, CLEAR EVERYTHING IN THE DATATODISPLAY ARRAYLIST
         ApplicationController.getInstance().getDataToDisplay().clear();
@@ -391,7 +397,7 @@ public class ClearSkiesService extends IntentService {
             sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
             locationPref = sharedPrefs.getString("locationPref", "Roaming");
             alarmPref = sharedPrefs.getString("timePicker", "20:00");
-            int hourPref = sharedPrefs.getInt("selectedHour", 18);
+            int hourPref = sharedPrefs.getInt("selectedHour", 20);
             int minPref = sharedPrefs.getInt("selectedMinute", 00);
 
 
@@ -488,7 +494,7 @@ public class ClearSkiesService extends IntentService {
             locationPref = sharedPrefs.getString("locationPref", "Roaming");
             alarmPref = sharedPrefs.getString("timePicker", "20:00");
             textLocation = sharedPrefs.getString("textLocation", "location unavailable");
-            int hourPref = sharedPrefs.getInt("selectedHour", 18);
+            int hourPref = sharedPrefs.getInt("selectedHour", 20);
             int minPref = sharedPrefs.getInt("selectedMinute", 00);
 
 
@@ -1171,7 +1177,7 @@ public class ClearSkiesService extends IntentService {
 
         //String address = response.getJSONArray("results").getJSONObject(0).getString("formatted_address");
        */
-
+        issSuccess = true;
         return issSuccess;
     }
 
@@ -1242,6 +1248,8 @@ public class ClearSkiesService extends IntentService {
         sharedPrefs.edit().putInt("weatherTier", weatherTier);
 
         ApplicationController.getInstance().getDataToDisplay().add(String.valueOf(time));
+
+        weatherSuccess = true;
         return weatherSuccess;
     }
 

@@ -146,7 +146,7 @@ public class CustomAdapter extends BaseAdapter {
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(context, "Clicked item is : " + textFirst.get(position), Toast.LENGTH_LONG).show();
+                //Toast.makeText(context, "Clicked item is : " + textFirst.get(position), Toast.LENGTH_LONG).show();
             }
         });
         return view;
