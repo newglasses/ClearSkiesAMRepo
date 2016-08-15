@@ -26,7 +26,8 @@
         <Preference
             android:key="@string/pref_time_picker_key"
             android:title="@string/pref_time_picker_label"
-            android:summary="@string/pref_time_picker_default">
+            android:summary="@string/pref_time_picker_default"
+            android:defaultValue="@string/pref_time_picker_default">
 
         </Preference>
 

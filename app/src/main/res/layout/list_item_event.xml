@@ -31,7 +31,7 @@
             android:id="@+id/list_second"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="36sp"
+            android:textSize="26sp"
             android:fontFamily="sans-serif-light"
             android:textColor="@color/white"
             android:text="Mid"/>

@@ -21,7 +21,7 @@ public class PreferenceHelper {
 
     public static boolean getUpdateCheckDaily(Context context){
 
-        //PreferenceManager.getDefaultSharedPreferences(context);
+        PreferenceManager.getDefaultSharedPreferences(context);
         return true;
 
 

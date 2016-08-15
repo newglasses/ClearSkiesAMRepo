@@ -23,12 +23,29 @@ tools:context="com.example.newglasses.clearskiesam.MainActivity">
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <ListView
-            style="@style/ForecastListStyle"
-            android:id="@+id/listView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:divider="@null" />
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/list_date"
+                android:text="DATE TEST"
+                android:padding="@dimen/place_autocomplete_button_padding"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-condensed"
+                android:textSize="20sp"/>
+
+            <ListView
+                style="@style/ForecastListStyle"
+                android:id="@+id/listView"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:divider="@null" />
+
+        </LinearLayout>
+
 
     </RelativeLayout>
 
@@ -43,7 +60,8 @@ tools:context="com.example.newglasses.clearskiesam.MainActivity">
             android:id="@+id/ivInstruction"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
             android:paddingTop="25dp"
             android:layout_marginRight="15dp"
             android:clickable="false"

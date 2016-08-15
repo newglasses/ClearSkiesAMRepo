@@ -51,7 +51,7 @@ public class DailyListener implements WakefulIntentService.AlarmListener {
         Log.e(LOG_TAG, "Inside the setAlarm()");
 
         sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
-        int hourPref = sharedPrefs.getInt("selectedHour", 18);
+        int hourPref = sharedPrefs.getInt("selectedHour", 20);
         int minPref = sharedPrefs.getInt("selectedMinute", 00);
 
         cal=Calendar.getInstance();
@@ -60,6 +60,10 @@ public class DailyListener implements WakefulIntentService.AlarmListener {
         cal.set(Calendar.HOUR_OF_DAY, hourPref);
         cal.set(Calendar.MINUTE, minPref);
         cal.set(Calendar.SECOND, 00);
+
+        if(cal.getTimeInMillis() < System.currentTimeMillis()) {
+            cal.add(Calendar.DAY_OF_YEAR, 1);
+        }
 
         Long alertTime = cal.getTimeInMillis();
 

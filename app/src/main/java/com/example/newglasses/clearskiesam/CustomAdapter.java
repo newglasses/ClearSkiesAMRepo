@@ -11,6 +11,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 /**
  * Created by newglasses on 11/08/2016.
@@ -28,6 +29,7 @@ public class CustomAdapter extends BaseAdapter {
 
     ArrayList<String> images, textFirst, textSecond, textThird, eventStyle;
     Context context;
+
     private static LayoutInflater inflater = null;
 
     // Constructor
@@ -45,6 +47,7 @@ public class CustomAdapter extends BaseAdapter {
         this.eventStyle = eventStyle;
 
         context = mainActivity;
+        String date = "";
 
         inflater = ( LayoutInflater )context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
@@ -139,25 +142,6 @@ public class CustomAdapter extends BaseAdapter {
         holder.secondText.setText(textSecond.get(position));
         holder.thirdText.setText(textThird.get(position));
 
-        //View rootView = inflater.inflate(R.layout.list_item , null);
-        //ViewHolder holder = new ViewHolder(rootView);
-
-        //holder.tv = (TextView) rootView.findViewById(R.id.myTV);
-        /*
-        holder.imageView =(ImageView) rootView.findViewById(R.id.list_icon);
-        holder.firstText = (TextView) rootView.findViewById(R.id.list_first);
-        holder.secondText = (TextView) rootView.findViewById(R.id.list_second);
-        holder.thirdText = (TextView) rootView.findViewById(R.id.list_third);
-
-
-
-        holder.firstText.setText(textFirst.get(position));
-        holder.secondText.setText(textSecond.get(position));
-        holder.thirdText.setText(textThird.get(position));
-
-        */
-
-        // holder.imageView.setImageResource(images[position]);
 
         view.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -252,6 +252,11 @@ public class SettingsActivity extends PreferenceActivity
                 stringHourMinute = hour + " : " + minute;
             }
 
+            // don't want to initialise the alarm if it has already passed for today
+            if (dateAndTime.getTimeInMillis() < System.currentTimeMillis()) {
+                sharedPrefs.edit().putBoolean("alreadyPassed", false).apply();
+            }
+
             sharedPrefs.edit().putString("timePicker", stringHourMinute).apply();
             sharedPrefs.edit().putInt("selectedHour", selectedHour).apply();
             sharedPrefs.edit().putInt("selectedMinute", selectedMinute).apply();

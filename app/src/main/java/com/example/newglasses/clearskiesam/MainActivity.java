@@ -10,11 +10,13 @@ import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.util.Calendar;
 
@@ -33,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
     private Activity thisActivity;
     private Long alarmTime;
 
+    private TextView dateView;
     private ListView listView;
     private boolean mUseEventLayout;
     // private static final String SELECTED_KEY = "selected_position";
@@ -47,6 +50,10 @@ public class MainActivity extends AppCompatActivity {
 
         topLevelLayout = findViewById(R.id.top_layout);
 
+        dateView = (TextView) findViewById(R.id.list_date);
+
+        dateView.setText(Utility.getFriendlyDayString(this, System.currentTimeMillis()));
+
         WakefulIntentService.scheduleAlarms(new DailyListener(), this, false);
 
         testBaseCustomAdapter = new CustomAdapter(this,
@@ -55,6 +62,8 @@ public class MainActivity extends AppCompatActivity {
                 ApplicationController.getInstance().getTextSecondArray(),
                 ApplicationController.getInstance().getTextThirdArray(),
                 ApplicationController.getInstance().getStyleArray());
+
+        // idea comes from here: http://www.androidtutorialsworld.com/android-custom-listview-example/
 
         listView = (ListView) findViewById(R.id.listView);
 
@@ -134,8 +143,10 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_refresh) {
-            WakefulIntentService.scheduleAlarms(new DailyListener(), MainActivity.this, false);
-            //startActivity(new Intent(this, MainActivity.class));
+            //WakefulIntentService.scheduleAlarms(new DailyListener(), MainActivity.this, false);
+            Intent clearSkiesIntent = new Intent(this, ClearSkiesService.class);
+            startService(clearSkiesIntent);
+            Log.e(LOG_TAG, "Refresh option has been selected");
             return true;
         }
 
@@ -161,7 +172,7 @@ public class MainActivity extends AppCompatActivity {
             topLevelLayout.setVisibility(View.VISIBLE);
 
             // Put default values in the ListView
-            ApplicationController.getInstance().getTextFirstArray().add("Date");
+            ApplicationController.getInstance().getTextFirstArray().add("Defaults");
             ApplicationController.getInstance().getTextFirstArray().add("NEXT UPDATE");
 
             ApplicationController.getInstance().getTextSecondArray().add(locationPref);

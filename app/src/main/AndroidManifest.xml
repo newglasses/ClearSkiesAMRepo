@@ -70,6 +70,9 @@
             android:name=".GPSService"
             android:exported="false" />
         <service
+            android:name=".GPSLocationService"
+            android:exported="false" />
+        <service
             android:name=".AuroraWatchService"
             android:exported="false" />
         <service
@@ -88,6 +91,13 @@
             android:enabled="true" >
             <intent-filter>
                 <action android:name="com.example.newglasses.amclearskies.GPS_DONE" />
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name=".ClearSkiesService$GPSLocationReceiver"
+            android:enabled="true" >
+            <intent-filter>
+                <action android:name="com.example.newglasses.amclearskies.LOCATION_DONE" />
             </intent-filter>
         </receiver>
         <receiver

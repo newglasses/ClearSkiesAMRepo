@@ -2,6 +2,7 @@ package com.example.newglasses.clearskiesam;
 
 import android.Manifest;
 import android.app.IntentService;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -26,6 +27,14 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
+
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
+
 
 /**
  * Created by newglasses on 02/08/2016.
@@ -98,9 +107,11 @@ public class GPSService extends IntentService implements LocationListener, Googl
             // only need one successful result returned
             locationRequest.setNumUpdates(1);
 
-
             // see if any other apps are updating more frequently every 15 seconds
             locationRequest.setFastestInterval(15 * MILLISECONDS_PER_SECOND);
+
+
+
 
         }
 
@@ -233,6 +244,9 @@ public class GPSService extends IntentService implements LocationListener, Googl
 
         Log.e(LOG_TAG, "Data from GPSService after added to sharedPrefs" + lat + " " + lng);
 
+        // Get the coords in text form
+        // coordsToText(this, lat, lng);
+
         if (withinBounds(location.getLatitude(), location.getLongitude())) {
             sharedPrefs.edit().putBoolean("withinBounds", true).apply();
         } else {
@@ -255,13 +269,10 @@ public class GPSService extends IntentService implements LocationListener, Googl
         }
         return withinBounds;
     }
-
-
     // Validates resource references inside Android XML files
     public GPSService() {
         super(GPSService.class.getName());
     }
-
 
     public GPSService(String name) {
         super(name);

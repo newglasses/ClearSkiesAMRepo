@@ -8,14 +8,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.MatrixCursor;
 import android.preference.PreferenceManager;
-import android.provider.BaseColumns;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
-import android.widget.SimpleCursorAdapter;
-
-import com.android.volley.VolleyLog;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -33,9 +28,8 @@ import java.io.UnsupportedEncodingException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
-import java.util.Locale;
-
 /**
  * Created by newglasses on 02/08/2016.
  * The ClearSkiesService manages the background work required for the application
@@ -79,6 +73,7 @@ public class ClearSkiesService extends IntentService {
     private static boolean auroraSuccess, issSuccess, weatherSuccess;
     protected static boolean noInternet;
     private static int weatherTier;
+    private static String textLocation;
 
     private static String sunsetTonight;
     private static String sunriseTom;
@@ -98,20 +93,7 @@ public class ClearSkiesService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
 
-        /*
-        sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-
-        auroraPref = sharedPrefs.getBoolean("aurora", true);
-        issPref = sharedPrefs.getBoolean("iss", true);
-        locationPref = sharedPrefs.getString("location", "pref_gps_list_titles");
-        alarmPref = sharedPrefs.getString("timePicker", "summary");
-
-        //ApplicationController.getInstance().getDataToDisplay().clear();
-        //startGPSService(this);
-        */
-
-        // TRYING OUT
-        Log.i(LOG_TAG, "onHandleIntent() started");
+        Log.i(LOG_TAG, "onHandleIntent() ClearSkiesService started");
 
         //BEFORE STARTING, CLEAR EVERYTHING IN THE DATATODISPLAY ARRAYLIST
         ApplicationController.getInstance().getDataToDisplay().clear();
@@ -124,6 +106,7 @@ public class ClearSkiesService extends IntentService {
         // Default preference is roaming
         String locationPref = sharedPrefs.getString("location", "1");
         Log.e(LOG_TAG, locationPref);
+        // Log.e(LOG_TAG, "what is going on here");
 
         // Check the device coordinates are in the UK
         boolean insideUK = sharedPrefs.getBoolean("withinBounds", false);
@@ -133,14 +116,12 @@ public class ClearSkiesService extends IntentService {
         auroraPref = sharedPrefs.getBoolean("aurora", true);
         issPref = sharedPrefs.getBoolean("iss", true);
 
-
         if (locationPref.equals("1") || locationPref.equals("-1")) {
             Log.e(LOG_TAG, "locationPref = Roaming");
             startGPSService(this);
 
         } else if (locationPref.equals("0")) {
             Log.e(LOG_TAG, "locationPref = Fixed");
-
 
             // CHECK IF THE SAVED COORDS ARE UK?? OR IS THAT DONE ALREADY?? FLAGGED ALREADY??
 
@@ -151,7 +132,7 @@ public class ClearSkiesService extends IntentService {
                 sendBroadcast(i);
             } else {
                 if (insideUK) {
-                    startWeatherService(this);
+                    Log.e(LOG_TAG, "I'm in here");
                 }
             }
         }
@@ -191,7 +172,9 @@ public class ClearSkiesService extends IntentService {
             // Dummy variable for testing: insideUK = false;
 
             if (insideUK) {
-                startWeatherService(context);
+
+                //startWeatherService(context);
+                startGPSLocationService(context);
             } else {
                 // HERE I NEED TO UPDATE THE UI ACCORDINGLY
                 Log.e(LOG_TAG, "Out of Bounds - Device currently not in the UK");
@@ -200,6 +183,32 @@ public class ClearSkiesService extends IntentService {
             }
         }
         public GPSRetrievedReceiver () {
+            super();
+        }
+    }
+
+    public static class GPSLocationReceiver extends BroadcastReceiver {
+
+        // For logging
+        private static final String LOG_TAG = ClearSkiesService.GPSLocationReceiver.class.getSimpleName();
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            Log.e(LOG_TAG, "My GPS Location receiver received a broadcast");
+            try {
+                String locationData = parseJSON(context, "GPS_Location_File");
+                parseLocation(locationData, context);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            startWeatherService(context);
+
+        }
+        public GPSLocationReceiver () {
             super();
         }
     }
@@ -382,7 +391,24 @@ public class ClearSkiesService extends IntentService {
             sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
             locationPref = sharedPrefs.getString("locationPref", "Roaming");
             alarmPref = sharedPrefs.getString("timePicker", "20:00");
+            int hourPref = sharedPrefs.getInt("selectedHour", 18);
+            int minPref = sharedPrefs.getInt("selectedMinute", 00);
 
+
+            String nextUpdate;
+
+            Calendar cal=Calendar.getInstance();
+            cal.setTimeInMillis(System.currentTimeMillis());
+
+            cal.set(Calendar.HOUR_OF_DAY, hourPref);
+            cal.set(Calendar.MINUTE, minPref);
+            cal.set(Calendar.SECOND, 00);
+
+            if(cal.getTimeInMillis() < System.currentTimeMillis()) {
+                nextUpdate = "Tomorrow";
+            } else {
+                nextUpdate = "Today";
+            }
 
             // LOOKING AT THE GATHERED DATA FOR LOGGING
             if (ApplicationController.getInstance().getDataToDisplay() != null) {
@@ -391,21 +417,55 @@ public class ClearSkiesService extends IntentService {
                 }
             }
 
+            /*
+            Long alertTime = cal.getTimeInMillis();
+
+            Date date = new Date(alertTime);
+            DateFormat formatter = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z");
+            String dateFormatted = formatter.format(date);
+
+            Log.e(LOG_TAG, "Alarm Time: " + dateFormatted);
+
+
+            Calendar dateAndTime = Calendar.getInstance();
+            // set selected time into time picker
+            dateAndTime.set(Calendar.HOUR_OF_DAY, sharedPrefs.getInt("selectedHour", 20));
+            dateAndTime.set(Calendar.MINUTE, sharedPrefs.getInt("selectedMin", 00));
+
+            long alarmSet = dateAndTime.getTimeInMillis();
+
+            // if the current time is already after the time the alarm has been set for
+            if (System.currentTimeMillis() < alarmSet) {
+                //dateAndTime.add(Calendar.DAY_OF_YEAR, 1);
+                //long tomInMillis = dateAndTime.getTimeInMillis();
+                nextUpdate = "Today";
+            } else {
+                nextUpdate = "Tomorrow";
+            }elsey else else
+            */
+            /*
+
+            // Get date tomorrow in friendly format
+            Calendar calendar = Calendar.getInstance();
+            calendar.add(Calendar.DAY_OF_YEAR, 1);
+            long tomorrowInMillis = calendar.getTimeInMillis();
+            // Find TextView and set weather forecast on it
+            viewHolder.secondText.setText(Utility.getFriendlyDayString(context, tomorrowInMillis));
+
+            */
+
             Utility.clearArrayLists();
 
             // REPOPULATE THE ARRAYLISTS DEPENDING ON RESULTS
 
-            ApplicationController.getInstance().getTextFirstArray().add("Date");
             ApplicationController.getInstance().getTextFirstArray().add("NEXT UPDATE");
 
-            ApplicationController.getInstance().getTextSecondArray().add(locationPref);
-            ApplicationController.getInstance().getTextSecondArray().add("Today");
+            ApplicationController.getInstance().getTextSecondArray().add(nextUpdate);
 
-            ApplicationController.getInstance().getTextThirdArray().add("No Events");
             ApplicationController.getInstance().getTextThirdArray().add(alarmPref);
 
             ApplicationController.getInstance().getStyleArray().add("0");
-            ApplicationController.getInstance().getStyleArray().add("1");
+
 
             MainActivity.testBaseCustomAdapter.notifyDataSetChanged();
         }
@@ -427,6 +487,25 @@ public class ClearSkiesService extends IntentService {
             sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
             locationPref = sharedPrefs.getString("locationPref", "Roaming");
             alarmPref = sharedPrefs.getString("timePicker", "20:00");
+            textLocation = sharedPrefs.getString("textLocation", "location unavailable");
+            int hourPref = sharedPrefs.getInt("selectedHour", 18);
+            int minPref = sharedPrefs.getInt("selectedMinute", 00);
+
+
+            String nextUpdate;
+
+            Calendar cal=Calendar.getInstance();
+            cal.setTimeInMillis(System.currentTimeMillis());
+
+            cal.set(Calendar.HOUR_OF_DAY, hourPref);
+            cal.set(Calendar.MINUTE, minPref);
+            cal.set(Calendar.SECOND, 00);
+
+            if(cal.getTimeInMillis() < System.currentTimeMillis()) {
+                nextUpdate = "Tomorrow";
+            } else {
+                nextUpdate = "Today";
+            }
 
 
             // LOOKING AT THE GATHERED DATA FOR LOGGING
@@ -440,11 +519,11 @@ public class ClearSkiesService extends IntentService {
 
             // REPOPULATE THE ARRAYLISTS DEPENDING ON RESULTS
 
-            ApplicationController.getInstance().getTextFirstArray().add("Date");
-            ApplicationController.getInstance().getTextFirstArray().add("Next Update");
+            ApplicationController.getInstance().getTextFirstArray().add(textLocation);
+            ApplicationController.getInstance().getTextFirstArray().add("NEXT UPDATE");
 
-            ApplicationController.getInstance().getTextSecondArray().add("No Events");
-            ApplicationController.getInstance().getTextSecondArray().add("Tomorrow");
+            ApplicationController.getInstance().getTextSecondArray().add("Nothing");
+            ApplicationController.getInstance().getTextSecondArray().add(nextUpdate);
 
             ApplicationController.getInstance().getTextThirdArray().add("To Declare");
             ApplicationController.getInstance().getTextThirdArray().add(alarmPref);
@@ -485,14 +564,13 @@ public class ClearSkiesService extends IntentService {
 
             // REPOPULATE THE ARRAYLISTS DEPENDING ON RESULTS
 
-            ApplicationController.getInstance().getTextFirstArray().add("Date");
+            ApplicationController.getInstance().getTextFirstArray().add("Network");
 
-            ApplicationController.getInstance().getTextSecondArray().add("Network Access");
+            ApplicationController.getInstance().getTextSecondArray().add("Access");
 
             ApplicationController.getInstance().getTextThirdArray().add("Required");
 
             ApplicationController.getInstance().getStyleArray().add("0");
-            // ApplicationController.getInstance().getStyleArray().add("1");
 
             MainActivity.testBaseCustomAdapter.notifyDataSetChanged();
         }
@@ -514,6 +592,24 @@ public class ClearSkiesService extends IntentService {
             sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
             locationPref = sharedPrefs.getString("locationPref", "Roaming");
             alarmPref = sharedPrefs.getString("timePicker", "20:00");
+            int hourPref = sharedPrefs.getInt("selectedHour", 18);
+            int minPref = sharedPrefs.getInt("selectedMinute", 00);
+
+
+            String nextUpdate;
+
+            Calendar cal=Calendar.getInstance();
+            cal.setTimeInMillis(System.currentTimeMillis());
+
+            cal.set(Calendar.HOUR_OF_DAY, hourPref);
+            cal.set(Calendar.MINUTE, minPref);
+            cal.set(Calendar.SECOND, 00);
+
+            if(cal.getTimeInMillis() < System.currentTimeMillis()) {
+                nextUpdate = "Tomorrow";
+            } else {
+                nextUpdate = "Today";
+            }
 
 
             // LOOKING AT THE GATHERED DATA FOR LOGGING
@@ -527,13 +623,13 @@ public class ClearSkiesService extends IntentService {
 
             // REPOPULATE THE ARRAYLISTS DEPENDING ON RESULTS
 
-            ApplicationController.getInstance().getTextFirstArray().add("Date");
-            ApplicationController.getInstance().getTextFirstArray().add("Next Update");
+            ApplicationController.getInstance().getTextFirstArray().add("Currently");
+            ApplicationController.getInstance().getTextFirstArray().add("NEXT UPDATE");
 
-            ApplicationController.getInstance().getTextSecondArray().add(locationPref);
-            ApplicationController.getInstance().getTextSecondArray().add("Tomorrow");
+            ApplicationController.getInstance().getTextSecondArray().add("Out");
+            ApplicationController.getInstance().getTextSecondArray().add(nextUpdate);
 
-            ApplicationController.getInstance().getTextThirdArray().add("Out of Range");
+            ApplicationController.getInstance().getTextThirdArray().add("of Range");
             ApplicationController.getInstance().getTextThirdArray().add(alarmPref);
 
             ApplicationController.getInstance().getStyleArray().add("0");
@@ -572,6 +668,7 @@ public class ClearSkiesService extends IntentService {
             cloudCover = sharedPrefs.getString("cloudCover", "null");
             visibility = sharedPrefs.getString("visibility", "null");
             weatherTier = sharedPrefs.getInt("weatherTier", weatherTier);
+            textLocation = sharedPrefs.getString("textLocation", "location unavailable");
 
             if (weatherTier == 0) {
                 weatherSummary = "Clear Skies Likely";
@@ -579,6 +676,25 @@ public class ClearSkiesService extends IntentService {
                 weatherSummary = "Clear Skies Possible";
             } else {
                 weatherSummary = "Error";
+            }
+
+            int hourPref = sharedPrefs.getInt("selectedHour", 20);
+            int minPref = sharedPrefs.getInt("selectedMinute", 00);
+
+
+            String nextUpdate;
+
+            Calendar cal=Calendar.getInstance();
+            cal.setTimeInMillis(System.currentTimeMillis());
+
+            cal.set(Calendar.HOUR_OF_DAY, hourPref);
+            cal.set(Calendar.MINUTE, minPref);
+            cal.set(Calendar.SECOND, 00);
+
+            if(cal.getTimeInMillis() < System.currentTimeMillis()) {
+                nextUpdate = "Tomorrow";
+            } else {
+                nextUpdate = "Today";
             }
 
             // LOOKING AT THE GATHERED DATA FOR LOGGING
@@ -592,13 +708,13 @@ public class ClearSkiesService extends IntentService {
 
             // REPOPULATE THE ARRAYLISTS DEPENDING ON RESULTS
 
-            ApplicationController.getInstance().getTextFirstArray().add("Date");
+            ApplicationController.getInstance().getTextFirstArray().add(textLocation);
             ApplicationController.getInstance().getTextFirstArray().add(weatherSummary);
-            ApplicationController.getInstance().getTextFirstArray().add("Next Update");
+            ApplicationController.getInstance().getTextFirstArray().add("NEXT UPDATE");
 
             ApplicationController.getInstance().getTextSecondArray().add("Aurora");
             ApplicationController.getInstance().getTextSecondArray().add(sunsetTonight);
-            ApplicationController.getInstance().getTextSecondArray().add("Tomorrow");
+            ApplicationController.getInstance().getTextSecondArray().add(nextUpdate);
 
             ApplicationController.getInstance().getTextThirdArray().add(auroraForecast);
             ApplicationController.getInstance().getTextThirdArray().add(sunriseTom);
@@ -627,6 +743,7 @@ public class ClearSkiesService extends IntentService {
             sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
             locationPref = sharedPrefs.getString("locationPref", "Roaming");
             alarmPref = sharedPrefs.getString("timePicker", "20:00");
+            textLocation = sharedPrefs.getString("textLocation", "location unavailable");
 
             long sunset = sharedPrefs.getLong("sunsetTonight", 0000L);
             Date sunsetD = new Date(sunset);
@@ -652,6 +769,25 @@ public class ClearSkiesService extends IntentService {
                 weatherSummary = "Error";
             }
 
+            int hourPref = sharedPrefs.getInt("selectedHour", 18);
+            int minPref = sharedPrefs.getInt("selectedMinute", 00);
+
+
+            String nextUpdate;
+
+            Calendar cal=Calendar.getInstance();
+            cal.setTimeInMillis(System.currentTimeMillis());
+
+            cal.set(Calendar.HOUR_OF_DAY, hourPref);
+            cal.set(Calendar.MINUTE, minPref);
+            cal.set(Calendar.SECOND, 00);
+
+            if(cal.getTimeInMillis() < System.currentTimeMillis()) {
+                nextUpdate = "Tomorrow";
+            } else {
+                nextUpdate = "Today";
+            }
+
 
             // LOOKING AT THE GATHERED DATA FOR LOGGING
             if (ApplicationController.getInstance().getDataToDisplay() != null) {
@@ -664,13 +800,13 @@ public class ClearSkiesService extends IntentService {
 
             // REPOPULATE THE ARRAYLISTS DEPENDING ON RESULTS
 
-            ApplicationController.getInstance().getTextFirstArray().add("Date");
+            ApplicationController.getInstance().getTextFirstArray().add(textLocation);
             ApplicationController.getInstance().getTextFirstArray().add(weatherSummary);
-            ApplicationController.getInstance().getTextFirstArray().add("Next Update");
+            ApplicationController.getInstance().getTextFirstArray().add("NEXT UPDATE");
 
             ApplicationController.getInstance().getTextSecondArray().add("ISS");
             ApplicationController.getInstance().getTextSecondArray().add(sunsetTonight);
-            ApplicationController.getInstance().getTextSecondArray().add("Tomorrow");
+            ApplicationController.getInstance().getTextSecondArray().add(nextUpdate);
 
             ApplicationController.getInstance().getTextThirdArray().add(issForecast);
             ApplicationController.getInstance().getTextThirdArray().add(sunriseTom);
@@ -700,6 +836,7 @@ public class ClearSkiesService extends IntentService {
             sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
             locationPref = sharedPrefs.getString("locationPref", "Roaming");
             alarmPref = sharedPrefs.getString("timePicker", "20:00");
+            textLocation = sharedPrefs.getString("textLocation", "location unavailable");
 
             auroraForecast = sharedPrefs.getString("auroraForecast", "nothing to display");
 
@@ -715,7 +852,6 @@ public class ClearSkiesService extends IntentService {
             long onForecast = sharedPrefs.getLong("onForecast", 0000L);
             Date onForecastD = new Date(onForecast);
             issForecast = df.format(onForecastD);
-
 
             weatherTier = sharedPrefs.getInt("weatherTier", weatherTier);
 
@@ -734,19 +870,38 @@ public class ClearSkiesService extends IntentService {
                 }
             }
 
+            int hourPref = sharedPrefs.getInt("selectedHour", 18);
+            int minPref = sharedPrefs.getInt("selectedMinute", 00);
+
+
+            String nextUpdate;
+
+            Calendar cal=Calendar.getInstance();
+            cal.setTimeInMillis(System.currentTimeMillis());
+
+            cal.set(Calendar.HOUR_OF_DAY, hourPref);
+            cal.set(Calendar.MINUTE, minPref);
+            cal.set(Calendar.SECOND, 00);
+
+            if(cal.getTimeInMillis() < System.currentTimeMillis()) {
+                nextUpdate = "Tomorrow";
+            } else {
+                nextUpdate = "Today";
+            }
+
             Utility.clearArrayLists();
 
             // REPOPULATE THE ARRAYLISTS DEPENDING ON RESULTS
 
-            ApplicationController.getInstance().getTextFirstArray().add("Date");
-            ApplicationController.getInstance().getTextFirstArray().add("ISS");
+            ApplicationController.getInstance().getTextFirstArray().add(textLocation);
+            ApplicationController.getInstance().getTextFirstArray().add("");
             ApplicationController.getInstance().getTextFirstArray().add(weatherSummary);
-            ApplicationController.getInstance().getTextFirstArray().add("Next Update");
+            ApplicationController.getInstance().getTextFirstArray().add("NEXT UPDATE");
 
             ApplicationController.getInstance().getTextSecondArray().add("Aurora");
-            ApplicationController.getInstance().getTextSecondArray().add("");
+            ApplicationController.getInstance().getTextSecondArray().add("ISS");
             ApplicationController.getInstance().getTextSecondArray().add(sunsetTonight);
-            ApplicationController.getInstance().getTextSecondArray().add("Tomorrow");
+            ApplicationController.getInstance().getTextSecondArray().add(nextUpdate);
 
             ApplicationController.getInstance().getTextThirdArray().add(auroraForecast);
             ApplicationController.getInstance().getTextThirdArray().add(issForecast);
@@ -1090,6 +1245,19 @@ public class ClearSkiesService extends IntentService {
         return weatherSuccess;
     }
 
+    public static void parseLocation(String fileData, Context context) throws JSONException, IOException {
+
+        JSONObject object = new JSONObject(fileData);
+
+        JSONObject addressComponents = object.getJSONArray("results").getJSONObject(1);
+        JSONObject city = addressComponents.getJSONArray("address_components").getJSONObject(2);
+        String location = city.getString("short_name");
+
+        Log.e("Inside JSONParser", "parsed: " + location);
+        sharedPrefs.edit().putString("textLocation", location).apply();
+    }
+
+
     public static final void beginDocument(XmlPullParser parser, String firstElementName)
             throws XmlPullParserException, IOException {
 
@@ -1109,7 +1277,9 @@ public class ClearSkiesService extends IntentService {
         // Verify that the tag passed in is the first tag in the XML document
 
         if (!parser.getName().equals(firstElementName)) {
-            throw new XmlPullParserException("Unexpected start tag: found " + parser.getName() + ", expected " + firstElementName);
+            throw new XmlPullParserException(
+                    "Unexpected start tag: found " + parser.getName() +
+                            ", expected " + firstElementName);
         }
     }
 
@@ -1179,6 +1349,13 @@ public class ClearSkiesService extends IntentService {
         // Create an intent to run the IntentService in the background & start it
         Intent gpsIntent = new Intent(context, GPSService.class);
         context.startService(gpsIntent);
+    }
+
+    public static void startGPSLocationService(Context context) {
+
+        // Create an intent to run the IntentService in the background & start it
+        Intent gpsLocationIntent = new Intent(context, GPSLocationService.class);
+        context.startService(gpsLocationIntent);
     }
 
     public static void startAuroraWatchService(Context context) {
