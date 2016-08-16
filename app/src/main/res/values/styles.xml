@@ -2,7 +2,7 @@
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="@style/Theme.AppCompat.Light.DarkActionBar">
-        <item name="colorPrimary">@color/sunshine_blue</item>
+        <item name="colorPrimary">@color/cs_black</item>
         <item name="colorPrimaryDark">@color/sunshine_dark_blue</item>
     </style>
 
@@ -17,8 +17,7 @@
 
     <!-- main activity action bar styles -->
     <style name="ActionBar.Solid.Sunshine.NoTitle" parent="@style/Widget.AppCompat.Light.ActionBar.Solid.Inverse">
-        <item name="displayOptions">useLogo|showHome</item>
-        <item name="logo">@drawable/ic_logo</item>
+
     </style>
 
     <!-- Style for forecast listview -->

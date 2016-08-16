@@ -173,8 +173,6 @@ public class SettingsActivity extends PreferenceActivity
         }
     };
 
-
-
     @Override
     public boolean onPreferenceChange(Preference preference, Object newValue) {
 
@@ -196,9 +194,6 @@ public class SettingsActivity extends PreferenceActivity
                 preference.setSummary(stringValue);
             }
         }
-
-        Log.e(LOG_TAG, "Something Updated");
-
         return true;
     }
 
@@ -244,14 +239,16 @@ public class SettingsActivity extends PreferenceActivity
             hour = selectedHour;
             minute = selectedMinute;
             String minutes = Integer.toString(selectedMinute);
+            String hours = Integer.toString(selectedHour);
 
             // formatting minutes for the Settings Summary Display
             if (minutes.length() < 2) {
                 minutes = "0" + minute;
-                stringHourMinute = hour + " : " + minutes;
-            } else {
-                stringHourMinute = hour + " : " + minute;
+
+            } else if (hours.length() < 2) {
+                hours = "0" + hours;
             }
+            stringHourMinute = hours + ":" + minutes;
 
             // don't want to initialise the alarm if it has already passed for today
             if (dateAndTime.getTimeInMillis() < System.currentTimeMillis()) {
@@ -279,7 +276,7 @@ public class SettingsActivity extends PreferenceActivity
             startActivity(newIntent);
             */
 
-            Toast.makeText(SettingsActivity.this, "Selected Alarm Time: " + stringHourMinute,
+            Toast.makeText(SettingsActivity.this, "Checking for events: " + stringHourMinute,
                     Toast.LENGTH_LONG).show();
 
             WakefulIntentService.scheduleAlarms(new DailyListener(), SettingsActivity.this, false);

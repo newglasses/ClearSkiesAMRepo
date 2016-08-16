@@ -123,7 +123,7 @@ public class CustomAdapter extends BaseAdapter {
         switch (viewType) {
             case VIEW_TYPE_LIST_EVENT: {
                 // Get weather icon
-                viewHolder.imageView.setImageResource(R.mipmap.ic_launcher);
+                viewHolder.imageView.setImageResource(R.drawable.cs_logo);
 
                 /*
                 viewHolder.imageView.setImageResource(Utility.getArtResourceForWeatherCondition(
@@ -133,7 +133,7 @@ public class CustomAdapter extends BaseAdapter {
             }
             case VIEW_TYPE_LIST_OTHER: {
                 // Get weather icon
-                viewHolder.imageView.setImageResource(R.mipmap.ic_launcher);
+                viewHolder.imageView.setImageResource(R.drawable.cs_smaller);
                 break;
             }
         }

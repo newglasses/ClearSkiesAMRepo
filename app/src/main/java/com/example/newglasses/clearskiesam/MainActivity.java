@@ -1,5 +1,7 @@
 package com.example.newglasses.clearskiesam;
 
+import android.annotation.TargetApi;
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -7,6 +9,7 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -18,6 +21,7 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.Calendar;
 
@@ -54,6 +58,8 @@ public class MainActivity extends AppCompatActivity {
 
         dateView = (TextView) findViewById(R.id.list_date);
 
+        final ActionBar actionBar = getActionBar();
+
         progressBar = (ProgressBar) findViewById(R.id.progress_bar);
 
         dateView.setText(Utility.getFriendlyDayString(this, System.currentTimeMillis()));
@@ -81,6 +87,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        Log.v(LOG_TAG, "Inside onRestoreInstanceState");
+    }
+
+    @Override
     protected void onPause() {
         super.onPause();
     }
@@ -88,7 +100,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
+
         getMenuInflater().inflate(R.menu.menu_main, menu);
+
         return true;
     }
 
@@ -111,6 +125,9 @@ public class MainActivity extends AppCompatActivity {
             Intent clearSkiesIntent = new Intent(this, ClearSkiesService.class);
             startService(clearSkiesIntent);
             Log.e(LOG_TAG, "Refresh option has been selected");
+            // Interim: TODO: Get the progressBar working
+            Toast.makeText(MainActivity.this, "Updating...",
+                    Toast.LENGTH_LONG).show();
             return true;
         }
 
@@ -132,12 +149,12 @@ public class MainActivity extends AppCompatActivity {
 
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         boolean ranBefore = sharedPrefs.getBoolean("ranBefore", false);
+        ranBefore = false;
         String locationPref = sharedPrefs.getString("locationPref", "Roaming");
         String alertTime = sharedPrefs.getString("timePicker", "20:00");
 
         int hourPref = sharedPrefs.getInt("selectedHour", 20);
         int minPref = sharedPrefs.getInt("selectedMinute", 00);
-
 
         String nextUpdate;
 
@@ -154,10 +171,6 @@ public class MainActivity extends AppCompatActivity {
             nextUpdate = "Today";
         }
 
-        if (!ranBefore) {
-            sharedPrefs.edit().putBoolean("ranBefore", true).apply();
-            topLevelLayout.setVisibility(View.VISIBLE);
-
             // Put default values in the ListView
             ApplicationController.getInstance().getTextFirstArray().add("Defaults");
             ApplicationController.getInstance().getTextFirstArray().add("NEXT UPDATE");
@@ -173,7 +186,12 @@ public class MainActivity extends AppCompatActivity {
 
             MainActivity.testBaseCustomAdapter.notifyDataSetChanged();
 
+        if (!ranBefore) {
+            sharedPrefs.edit().putBoolean("ranBefore", true).apply();
+            topLevelLayout.setVisibility(View.VISIBLE);
+
             topLevelLayout.setOnTouchListener(new View.OnTouchListener() {
+                @TargetApi(Build.VERSION_CODES.HONEYCOMB)
                 @Override
                 public boolean onTouch(View view, MotionEvent motionEvent) {
                     startActivity(new Intent(MainActivity.this, SettingsActivity.class));

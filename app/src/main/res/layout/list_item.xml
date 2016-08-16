@@ -17,7 +17,9 @@
             android:id="@+id/list_icon"
             android:layout_gravity="center"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:paddingRight="@dimen/place_autocomplete_button_padding"
+            android:paddingLeft="@dimen/place_autocomplete_button_padding"/>
 
     </FrameLayout>
 
@@ -31,6 +33,7 @@
             android:id="@+id/list_first"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
             android:fontFamily="sans-serif-condensed"
             android:textSize="20sp"/>
 
@@ -47,7 +50,8 @@
             android:id="@+id/list_second"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
+            android:layout_gravity="right"
+            android:layout_marginRight="@dimen/place_autocomplete_button_padding"
             android:fontFamily="sans-serif-condensed"
             android:textAppearance="?android:textAppearanceLarge"/>
 
@@ -55,7 +59,8 @@
             android:id="@+id/list_third"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
+            android:layout_gravity="right"
+            android:layout_marginRight="@dimen/place_autocomplete_button_padding"
             android:fontFamily="sans-serif-condensed"
             android:textAppearance="?android:textAppearanceSmall" />
     </LinearLayout>

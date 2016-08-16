@@ -8,10 +8,13 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Handler;
+import android.os.Message;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -73,6 +76,9 @@ public class ClearSkiesService extends IntentService {
     private static final String MAKE_NOTIFICATION =
             "com.example.newglasses.amclearskies.MAKE_NOTIFICATION";
 
+    public static final int START = 0;
+    public static final int STOP = 1;
+
     // DATA OUTCOMES DETERMINE UPDATE OF THE UI
     private static boolean auroraSuccess, issSuccess, weatherSuccess;
     protected static boolean noInternet;
@@ -93,6 +99,8 @@ public class ClearSkiesService extends IntentService {
     private static String locationPref, alarmPref;
     private static boolean issPref, auroraPref;
     private static int key = 0;
+
+    private static Handler listHandler;
 
     @Override
     protected void onHandleIntent(Intent intent) {
@@ -143,6 +151,25 @@ public class ClearSkiesService extends IntentService {
             }
         }
     }
+
+    /*
+    public void updateUI() {
+        listHandler = new Handler() {
+            public void handleMessage(Message msg) {
+                switch (msg.what) {
+                    case START:
+                        MainActivity.progressBar.setVisibility(View.VISIBLE);
+                        break;
+                    case STOP:
+                        MainActivity.progressBar.setVisibility(View.INVISIBLE);
+                        break;
+                }
+                super.handleMessage(msg);
+            }
+        };
+    }
+
+    */
 
     /***********************************************************************************************
      ************************************************************************************************
@@ -522,6 +549,7 @@ public class ClearSkiesService extends IntentService {
             }
 
             Utility.clearArrayLists();
+            ClearSkiesService.listHandler.sendEmptyMessage(START);
 
             // REPOPULATE THE ARRAYLISTS DEPENDING ON RESULTS
 
@@ -1314,12 +1342,10 @@ public class ClearSkiesService extends IntentService {
         PendingIntent notificIntent = PendingIntent.getActivity(context, 0,
                 new Intent(context, MainActivity.class), 0);
 
-
-
         // Builds a notification
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(context)
-                        .setSmallIcon(R.mipmap.ic_launcher)
+                        .setSmallIcon(R.drawable.cs_smaller_white)
                         .setContentTitle(msg)
                         .setTicker(msgAlert)
                         .setContentText(msgText);

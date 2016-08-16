@@ -27,7 +27,8 @@
             android:key="@string/pref_time_picker_key"
             android:title="@string/pref_time_picker_label"
             android:summary="@string/pref_time_picker_default"
-            android:defaultValue="@string/pref_time_picker_default">
+            android:defaultValue="@string/pref_time_picker_default"
+            android:icon="@drawable/ic_alarm_black_24dp">
 
         </Preference>
 
@@ -46,7 +47,7 @@
             android:entryValues="@array/pref_gps_list_values"
             android:negativeButtonText="@null"
             android:positiveButtonText="@null"
-            android:icon="@mipmap/ic_launcher"/>
+            android:icon="@drawable/ic_map_black_24dp"/>
 
     </PreferenceCategory>
 

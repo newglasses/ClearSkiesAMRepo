@@ -15,7 +15,7 @@
         android:layout_weight="7"
         android:layout_marginTop="16dp"
         android:layout_marginBottom="16dp"
-        android:layout_marginLeft="60dp"
+        android:layout_marginLeft="50dp"
         android:orientation="vertical">
 
         <TextView
@@ -31,7 +31,7 @@
             android:id="@+id/list_second"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="26sp"
+            android:textSize="36sp"
             android:fontFamily="sans-serif-light"
             android:textColor="@color/white"
             android:text="Mid"/>
@@ -41,8 +41,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="@color/white"
-            android:textSize="36sp"
-            android:layout_marginLeft="8dp"
+            android:textSize="26sp"
+            android:layout_marginLeft="0dp"
             android:text="Bottom"/>
     </LinearLayout>
 
@@ -58,8 +58,7 @@
             android:id="@+id/list_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:background="@mipmap/ic_launcher"/>
+            android:layout_gravity="center_horizontal"/>
 
     </LinearLayout>
 </LinearLayout>
