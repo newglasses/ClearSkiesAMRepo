@@ -21,11 +21,9 @@
     <string name="pref_title_define_other">Other</string>
 
     <string-array name="pref_gps_list_titles">
-        <item>Fix to current</item>
         <item>Roaming</item>
     </string-array>
     <string-array name="pref_gps_list_values">
-        <item>0</item>
         <item>1</item>
     </string-array>
 

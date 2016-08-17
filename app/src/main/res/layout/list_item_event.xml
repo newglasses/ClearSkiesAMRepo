@@ -11,12 +11,13 @@
 
     <LinearLayout
         android:layout_height="wrap_content"
-        android:layout_width="0dp"
-        android:layout_weight="5"
+        android:layout_width="wrap_content"
         android:layout_marginTop="16dp"
         android:layout_marginBottom="16dp"
         android:layout_marginLeft="50dp"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:background="@drawable/cs_logo"
+        android:layout_weight="2">
 
         <TextView
             android:id="@+id/list_first"
@@ -43,23 +44,7 @@
             android:textColor="@color/white"
             android:textSize="26sp"
             android:layout_marginLeft="0dp"
-            android:text="Bottom"/>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_height="wrap_content"
-        android:layout_width="0dp"
-        android:layout_weight="8"
-        android:layout_marginRight="16dp"
-        android:orientation="vertical"
-        android:gravity="center_horizontal|bottom">
-
-        <ImageView
-            android:id="@+id/list_icon"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_gravity="center_horizontal" />
+            android:text="Bottom" />
 
     </LinearLayout>
 

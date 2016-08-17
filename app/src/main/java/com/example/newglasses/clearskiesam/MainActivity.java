@@ -178,7 +178,7 @@ public class MainActivity extends AppCompatActivity {
             ApplicationController.getInstance().getTextFirstArray().add("Defaults");
             ApplicationController.getInstance().getTextFirstArray().add("NEXT UPDATE");
 
-            ApplicationController.getInstance().getTextSecondArray().add("Roam");
+            ApplicationController.getInstance().getTextSecondArray().add("Roaming");
             ApplicationController.getInstance().getTextSecondArray().add(nextUpdate);
 
             ApplicationController.getInstance().getTextThirdArray().add(alertTime);

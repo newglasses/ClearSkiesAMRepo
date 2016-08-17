@@ -110,7 +110,7 @@ public class SettingsActivity extends PreferenceActivity
             }
         });
 
-        // When the cancel button is clicked the ClearSkies background work is cancelled
+        // TODO When the cancel button is clicked the ClearSkies background work is cancelled
         cancelClearSkies = (Preference) findPreference("cancel");
         cancelClearSkies.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
 

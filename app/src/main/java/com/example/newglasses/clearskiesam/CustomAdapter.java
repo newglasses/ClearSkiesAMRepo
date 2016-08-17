@@ -123,7 +123,7 @@ public class CustomAdapter extends BaseAdapter {
         switch (viewType) {
             case VIEW_TYPE_LIST_EVENT: {
                 // Get weather icon
-                viewHolder.imageView.setImageResource(R.drawable.cs_logo);
+                // viewHolder.imageView.setImageResource(R.drawable.cs_logo);
 
                 /*
                 viewHolder.imageView.setImageResource(Utility.getArtResourceForWeatherCondition(
