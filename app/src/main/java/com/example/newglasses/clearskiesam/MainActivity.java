@@ -120,8 +120,10 @@ public class MainActivity extends AppCompatActivity {
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_refresh) {
             //WakefulIntentService.scheduleAlarms(new DailyListener(), MainActivity.this, false);
-            Intent clearSkiesIntent = new Intent(this, ClearSkiesService.class);
-            startService(clearSkiesIntent);
+
+            // Intent clearSkiesIntent = new Intent(this, ClearSkiesService.class);
+            // startService(clearSkiesIntent);
+            ConnectivityReceiver.enableReceiver(this);
             Log.e(LOG_TAG, "Refresh option has been selected");
             // Interim: TODO: Get the progressBar working
             Toast.makeText(MainActivity.this, "Updating...",

@@ -244,9 +244,6 @@ public class ClearSkiesService extends IntentService {
         public void onReceive(Context context, Intent intent) {
             Log.e(LOG_TAG, "My weather receiver received a broadcast");
 
-            // Dummy data
-            //weatherSuccess = false;
-
             sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
 
             auroraPref = sharedPrefs.getBoolean("aurora", true);
@@ -269,6 +266,11 @@ public class ClearSkiesService extends IntentService {
                 } else if (issPref) {
                     Log.e(LOG_TAG, "ISS pref is: " + issPref);
                     startOpenNotifyService(context);
+                } else {
+                    Log.e(LOG_TAG, "No events selected in prefs");
+                    // end the service and upate the UI
+                    Intent i = new Intent(NOTHING_TO_DECLARE);
+                    context.sendBroadcast(i);
                 }
 
             } else {
@@ -278,8 +280,8 @@ public class ClearSkiesService extends IntentService {
                 context.sendBroadcast(i);
 
                 // currently just for testing
-                Intent iN = new Intent(MAKE_NOTIFICATION);
-                context.sendBroadcast(iN);
+                // Intent iN = new Intent(MAKE_NOTIFICATION);
+                // context.sendBroadcast(iN);
             }
         }
         public WeatherDownloadReceiver () {
@@ -996,6 +998,9 @@ public class ClearSkiesService extends IntentService {
             if (auroraForecast.equals("No significant activity")) {
                 Log.e(LOG_TAG, "Nothing to show: " + auroraForecast);
                 auroraSuccess = false;
+                // Update sharedPrefs for testing
+                sharedPrefs.edit().putString("auroraForecast", auroraForecast).apply();
+                auroraSuccess = true;
 
             } else if (auroraForecast.equals("Minor geomagnetic activity")) {
                 // Aurora may be visible by eye from Scotland
@@ -1103,6 +1108,8 @@ public class ClearSkiesService extends IntentService {
         Log.e(LOG_TAG, "sunset (long) " + sunset + " and today (long) " + today);
         Log.e(LOG_TAG, "sunset date " + sunsetDf + " and today date " + todayDf);
 
+        // unix timestamp * 1000L to "upcast" to Long and multiply by 1000 since since
+        // Java is expecting millisecs
         //taking twilight (1hr) into account but varies according to coords
         Date darkD = new Date((sunset*1000L) + (60*60*1000));
         DateFormat dfDark = new SimpleDateFormat("HH mm");
@@ -1127,7 +1134,11 @@ public class ClearSkiesService extends IntentService {
                 // Update the sharedPrefs that will populate the UI
                 sharedPrefs.edit().putString("onForecast", passRiseTime.get(0).toString()).apply();
             } else {
-                issSuccess = false;
+                //issSuccess = false;
+                // just for testing
+                issSuccess = true;
+                passRiseTime.add(passes.get(0).getLong("risetime"));
+                sharedPrefs.edit().putString("onForecast", passRiseTime.get(0).toString()).apply();
             }
         }
 
@@ -1149,29 +1160,17 @@ public class ClearSkiesService extends IntentService {
         // String risetime = pass.getString("risetime");
         int risetimeInt = Integer.parseInt(pass.getString("risetime"));
 
-        // unix timestamp * 1000L to "upcast" to Long and multiply by 1000 since since Java is expecting millisecs
+
         Date time = new Date (risetimeInt*1000L);
         String timeFinal = time.toString();
 
         //String address = response.getJSONArray("results").getJSONObject(0).getString("formatted_address");
        */
-        issSuccess = true;
+
         return issSuccess;
     }
 
     public static boolean parseWeather(String fileData, Context context) throws JSONException, IOException {
-
-        /*
-        JSONObject object = new JSONObject(fileData);
-        JSONObject currently = object.getJSONObject("currently");
-        String summary = currently.getString("summary");
-        String visibility = currently.getString("visibility");
-        String weatherCombined = summary + " " + visibility;
-
-        */
-        // ApplicationController.getInstance().getMatrixCursor().addRow(new Object[]{6, 1, "Weather", "White", "Out"});
-
-        // JSONObject satEntry = satResponse.getJSONArray("response").getJSONObject(i);
 
         JSONObject object = new JSONObject(fileData);
         JSONObject daily = object.getJSONObject("daily");
@@ -1210,9 +1209,10 @@ public class ClearSkiesService extends IntentService {
 
         } else {
             // JUST FOR NOW FOR TESTING KEEP WEATHERSUCCESS AS TRUE
-            // weather success should be false and weather tier should be 2
-            weatherSuccess = true;
-            weatherTier = 1;
+            // weatherSuccess = true;
+            // weatherTier = 1;
+            weatherSuccess = false;
+            weatherTier = 2;
         }
 
         // SAVE THE INFO NEEDED IN OTHER PARTS OF THE APP IN THE SHARED PREFS

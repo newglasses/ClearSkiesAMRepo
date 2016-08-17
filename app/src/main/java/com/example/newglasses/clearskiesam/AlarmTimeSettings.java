@@ -12,8 +12,6 @@ import android.widget.Toast;
  */
 public class AlarmTimeSettings implements TimePickerDialog.OnTimeSetListener {
 
-
-
     // context accessed here - needed to display a toast
     // we want to show the time selected as a toast
 
