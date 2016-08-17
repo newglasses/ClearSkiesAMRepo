@@ -80,7 +80,8 @@ tools:context="com.example.newglasses.clearskiesam.MainActivity">
             android:clickable="false"
             android:paddingLeft="30dip"
             android:scaleType="center"
-            android:src="@drawable/cs_welcome"/>
+            android:src="@drawable/cs_welcome"
+            android:hapticFeedbackEnabled="true"/>
 
     </RelativeLayout>
 

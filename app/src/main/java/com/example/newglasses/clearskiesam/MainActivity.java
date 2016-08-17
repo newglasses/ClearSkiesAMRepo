@@ -58,8 +58,6 @@ public class MainActivity extends AppCompatActivity {
 
         dateView = (TextView) findViewById(R.id.list_date);
 
-        final ActionBar actionBar = getActionBar();
-
         progressBar = (ProgressBar) findViewById(R.id.progress_bar);
 
         dateView.setText(Utility.getFriendlyDayString(this, System.currentTimeMillis()));
@@ -175,7 +173,7 @@ public class MainActivity extends AppCompatActivity {
             ApplicationController.getInstance().getTextFirstArray().add("Defaults");
             ApplicationController.getInstance().getTextFirstArray().add("NEXT UPDATE");
 
-            ApplicationController.getInstance().getTextSecondArray().add(locationPref);
+            ApplicationController.getInstance().getTextSecondArray().add("Roam");
             ApplicationController.getInstance().getTextSecondArray().add(nextUpdate);
 
             ApplicationController.getInstance().getTextThirdArray().add(alertTime);

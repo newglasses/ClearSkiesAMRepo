@@ -12,7 +12,7 @@
     <LinearLayout
         android:layout_height="wrap_content"
         android:layout_width="0dp"
-        android:layout_weight="7"
+        android:layout_weight="5"
         android:layout_marginTop="16dp"
         android:layout_marginBottom="16dp"
         android:layout_marginLeft="50dp"
@@ -20,7 +20,7 @@
 
         <TextView
             android:id="@+id/list_first"
-            android:layout_width="match_parent"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:textAppearance="?android:textAppearanceLarge"
             android:fontFamily="sans-serif-condensed"
@@ -29,7 +29,7 @@
 
         <TextView
             android:id="@+id/list_second"
-            android:layout_width="match_parent"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:textSize="36sp"
             android:fontFamily="sans-serif-light"
@@ -38,27 +38,29 @@
 
         <TextView
             android:id="@+id/list_third"
-            android:layout_width="match_parent"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:textColor="@color/white"
             android:textSize="26sp"
             android:layout_marginLeft="0dp"
             android:text="Bottom"/>
+
     </LinearLayout>
 
     <LinearLayout
         android:layout_height="wrap_content"
         android:layout_width="0dp"
-        android:layout_weight="5"
+        android:layout_weight="8"
         android:layout_marginRight="16dp"
         android:orientation="vertical"
         android:gravity="center_horizontal|bottom">
 
         <ImageView
             android:id="@+id/list_icon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"/>
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_gravity="center_horizontal" />
 
     </LinearLayout>
+
 </LinearLayout>
