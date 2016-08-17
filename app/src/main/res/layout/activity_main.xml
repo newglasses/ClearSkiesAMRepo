@@ -45,6 +45,7 @@ tools:context="com.example.newglasses.clearskiesam.MainActivity">
                 android:id="@+id/listView"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
+                android:background="@color/cs_black"
                 android:divider="@null" />
 
         </LinearLayout>

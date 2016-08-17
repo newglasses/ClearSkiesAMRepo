@@ -152,7 +152,10 @@ public class MainActivity extends AppCompatActivity {
 
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         boolean ranBefore = sharedPrefs.getBoolean("ranBefore", false);
-        ranBefore = false;
+
+        // for testing/ updating
+        // ranBefore = false;
+
         String locationPref = sharedPrefs.getString("locationPref", "Roaming");
         String alertTime = sharedPrefs.getString("timePicker", "20:00");
 
@@ -178,7 +181,7 @@ public class MainActivity extends AppCompatActivity {
             ApplicationController.getInstance().getTextFirstArray().add("Defaults");
             ApplicationController.getInstance().getTextFirstArray().add("NEXT UPDATE");
 
-            ApplicationController.getInstance().getTextSecondArray().add("Roaming");
+            ApplicationController.getInstance().getTextSecondArray().add(locationPref);
             ApplicationController.getInstance().getTextSecondArray().add(nextUpdate);
 
             ApplicationController.getInstance().getTextThirdArray().add(alertTime);

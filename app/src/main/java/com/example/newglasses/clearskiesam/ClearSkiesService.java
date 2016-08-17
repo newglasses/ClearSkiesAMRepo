@@ -132,7 +132,7 @@ public class ClearSkiesService extends IntentService {
             Log.e(LOG_TAG, "locationPref = Roaming");
             startGPSService(this);
 
-        // If location is fixed
+        // If location is fixed ** This is not currently an option **
         } else if (locationPref.equals("0")) {
             Log.e(LOG_TAG, "locationPref = Fixed");
             // Check the device coordinates are in the UK
@@ -999,8 +999,8 @@ public class ClearSkiesService extends IntentService {
                 Log.e(LOG_TAG, "Nothing to show: " + auroraForecast);
                 auroraSuccess = false;
                 // Update sharedPrefs for testing
-                sharedPrefs.edit().putString("auroraForecast", auroraForecast).apply();
-                auroraSuccess = true;
+                // sharedPrefs.edit().putString("auroraForecast", auroraForecast).apply();
+                // auroraSuccess = true;
 
             } else if (auroraForecast.equals("Minor geomagnetic activity")) {
                 // Aurora may be visible by eye from Scotland
@@ -1134,11 +1134,11 @@ public class ClearSkiesService extends IntentService {
                 // Update the sharedPrefs that will populate the UI
                 sharedPrefs.edit().putString("onForecast", passRiseTime.get(0).toString()).apply();
             } else {
-                //issSuccess = false;
+                issSuccess = false;
                 // just for testing
-                issSuccess = true;
-                passRiseTime.add(passes.get(0).getLong("risetime"));
-                sharedPrefs.edit().putString("onForecast", passRiseTime.get(0).toString()).apply();
+                // issSuccess = true;
+                // passRiseTime.add(passes.get(0).getLong("risetime"));
+                // sharedPrefs.edit().putString("onForecast", passRiseTime.get(0).toString()).apply();
             }
         }
 
