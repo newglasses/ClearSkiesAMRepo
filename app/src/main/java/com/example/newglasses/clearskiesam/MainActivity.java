@@ -119,15 +119,18 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_refresh) {
-            //WakefulIntentService.scheduleAlarms(new DailyListener(), MainActivity.this, false);
-
-            // Intent clearSkiesIntent = new Intent(this, ClearSkiesService.class);
-            // startService(clearSkiesIntent);
-            ConnectivityReceiver.enableReceiver(this);
             Log.e(LOG_TAG, "Refresh option has been selected");
-            // Interim: TODO: Get the progressBar working
-            Toast.makeText(MainActivity.this, "Updating...",
-                    Toast.LENGTH_LONG).show();
+            // WakefulIntentService.scheduleAlarms(new DailyListener(), MainActivity.this, false);
+            if (isNetworkAvailable()) {
+                Intent clearSkiesIntent = new Intent(this, ClearSkiesService.class);
+                startService(clearSkiesIntent);
+                // Interim: TODO: Get the progressBar working
+                Toast.makeText(MainActivity.this, "Updating...", Toast.LENGTH_LONG).show();
+            } else {
+                ClearSkiesService.noInternet = true;
+                Intent i = new Intent(ClearSkiesService.NO_INTERNET);
+                sendBroadcast(i);
+            }
             return true;
         }
 
@@ -212,4 +215,16 @@ public class MainActivity extends AppCompatActivity {
         }
     return ranBefore;
     }
+
+    public boolean isNetworkAvailable() {
+        ConnectivityManager cm = (ConnectivityManager)
+                getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = cm.getActiveNetworkInfo();
+        // if no network is available networkInfo will be null
+        // otherwise check if we are connected
+        if (networkInfo != null && networkInfo.isConnected()) {
+            return true;
+        }
+        return false;
+    } // CODE TAKEN FROM HERE: http://www.vogella.com/tutorials/AndroidNetworking/article.html
 }
