@@ -206,7 +206,10 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
 
+
         } else {
+
+            Utility.clearArrayLists();
 
             ApplicationController.getInstance().getTextFirstArray().add("NEXT UPDATE");
 
@@ -215,6 +218,7 @@ public class MainActivity extends AppCompatActivity {
             ApplicationController.getInstance().getTextThirdArray().add(alertTime);
 
             ApplicationController.getInstance().getStyleArray().add("0");
+
         }
     return ranBefore;
     }
