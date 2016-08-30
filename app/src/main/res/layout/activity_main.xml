@@ -38,7 +38,7 @@ tools:context="com.example.newglasses.clearskiesam.MainActivity">
                 android:textStyle="bold"
                 android:paddingLeft="80dp"
                 android:textSize="20sp"
-                android:textColor="#757575"/>
+                android:textColor="@color/list_date"/>
 
             <ListView
                 style="@style/ForecastListStyle"
@@ -66,7 +66,7 @@ tools:context="com.example.newglasses.clearskiesam.MainActivity">
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#88666666"
+        android:background="@color/overlay_background"
         android:id="@+id/top_layout"
         >
 

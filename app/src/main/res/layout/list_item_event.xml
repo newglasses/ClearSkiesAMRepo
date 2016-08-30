@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Layout for weather forecast list item for today -->
+<!-- Layout for event list item -->
 <!-- listPreferredItemHeight ensures the list item is a good size to tap -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"

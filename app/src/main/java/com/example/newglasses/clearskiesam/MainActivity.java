@@ -124,7 +124,7 @@ public class MainActivity extends AppCompatActivity {
             if (isNetworkAvailable()) {
                 Intent clearSkiesIntent = new Intent(this, ClearSkiesService.class);
                 startService(clearSkiesIntent);
-                // Interim: TODO: Get the progressBar working
+                // TODO: Get the progressBar working
                 Toast.makeText(MainActivity.this, "Updating...", Toast.LENGTH_LONG).show();
             } else {
                 ClearSkiesService.noInternet = true;

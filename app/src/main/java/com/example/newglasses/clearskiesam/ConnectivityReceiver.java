@@ -10,7 +10,11 @@ import android.net.NetworkInfo;
 import android.util.Log;
 
 /**
- * Created by newglasses on 09/08/2016.
+ * Created by newglasses on 09/08/2016
+ * Code taken from here: https://www.sufficientlysecure.org/2012/05/24/service-daily.html
+ * Includes BackgroundSErvice, DailyListener
+ * My solution to this problem is to enable a BroadcastReceiver which is triggered when the connectivity in Android changes.
+ * Then when Internet is available the background service is started and the receiver disables itself.
  */
 public class ConnectivityReceiver extends BroadcastReceiver {
 

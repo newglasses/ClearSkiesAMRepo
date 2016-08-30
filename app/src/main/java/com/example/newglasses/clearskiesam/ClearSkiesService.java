@@ -129,6 +129,11 @@ public class ClearSkiesService extends IntentService {
 
         // If location pref is roaming OR default (roaming), then start the GPS Service
         if (locationPref.equals("1") || locationPref.equals("-1")) {
+            // just for testing
+            // Log.e(LOG_TAG, "Out of Bounds - Device currently not in the UK");
+            // Intent i = new Intent(OUT_OF_RANGE);
+            // sendBroadcast(i);
+            // ACTUAL
             Log.e(LOG_TAG, "locationPref = Roaming");
             startGPSService(this);
 
@@ -1136,9 +1141,10 @@ public class ClearSkiesService extends IntentService {
             } else {
                 issSuccess = false;
                 // just for testing
-                // issSuccess = true;
+                //issSuccess = true;
                 // passRiseTime.add(passes.get(0).getLong("risetime"));
                 // sharedPrefs.edit().putString("onForecast", passRiseTime.get(0).toString()).apply();
+                //sharedPrefs.edit().putString("onForecast", "1471558560").apply();
             }
         }
 
@@ -1208,9 +1214,9 @@ public class ClearSkiesService extends IntentService {
             weatherTier = 1;
 
         } else {
-            // JUST FOR NOW FOR TESTING KEEP WEATHERSUCCESS AS TRUE
-            // weatherSuccess = true;
-            // weatherTier = 1;
+            // JUST FOR NOW FOR TESTING KEEP WEATHER SUCCESS AS TRUE
+            //weatherSuccess = true;
+            //weatherTier = 0;
             weatherSuccess = false;
             weatherTier = 2;
         }
