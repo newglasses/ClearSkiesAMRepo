@@ -1,3 +1,21 @@
+/***
+ Copyright (c) 2011 CommonsWare, LLC
+
+ Licensed under the Apache License, Version 2.0 (the "License"); you may
+ not use this file except in compliance with the License. You may obtain
+ a copy of the License at
+ http://www.apache.org/licenses/LICENSE-2.0
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+
+ Code tutorial: https://www.sufficientlysecure.org/2012/05/24/service-daily.html
+ Source code: https://github.com/commonsguy/cwac-wakeful
+
+ */
+
 package com.example.newglasses.clearskiesam;
 
 import android.app.AlarmManager;
@@ -16,7 +34,8 @@ import java.util.Calendar;
 import java.util.Date;
 
 /**
- * Created by newglasses on 09/08/2016.
+ * Created by newglasses on 09/08/2016
+ * Listener to check for internet connectivity at alarm time
  */
 public class DailyListener implements WakefulIntentService.AlarmListener {
 
@@ -26,27 +45,6 @@ public class DailyListener implements WakefulIntentService.AlarmListener {
 
 
     public void scheduleAlarms(AlarmManager mgr, PendingIntent pi, Context context) {
-
-        /*
-        // register when enabled in preferences
-        if (PreferenceHelper.getUpdateCheckDaily(context)) {
-            Log.i("DailyListener", "Schedule update check...");
-
-            // every day at 9 am
-            Calendar calendar = Calendar.getInstance();
-            // if it's after or equal 9 am schedule for next day
-            if (Calendar.getInstance().get(Calendar.HOUR_OF_DAY) &gt;= 9) {
-                calendar.add(Calendar.DAY_OF_YEAR, 1); // add, not set!
-            }
-            calendar.set(Calendar.HOUR_OF_DAY, 9);
-            calendar.set(Calendar.MINUTE, 0);
-            calendar.set(Calendar.SECOND, 0);
-
-            mgr.setInexactRepeating(AlarmManager.RTC, calendar.getTimeInMillis(),
-                    AlarmManager.INTERVAL_DAY, pi);
-        }
-
-        */
 
         Log.e(LOG_TAG, "Inside the setAlarm()");
 
@@ -96,12 +94,9 @@ public class DailyListener implements WakefulIntentService.AlarmListener {
                     || (netInfo.getType() == ConnectivityManager.TYPE_WIFI)) {
                 Log.d(LOG_TAG, "We have internet, start update check directly now!");
 
-                // FROM EXAMPLE:
                 Intent backgroundIntent = new Intent(context, BackgroundService.class);
                 WakefulIntentService.sendWakefulWork(context, backgroundIntent);
 
-                //AlarmTime alarmTime = new AlarmTime();
-                //alarmTime.setAlarm(context);
 
             } else {
                 Log.d(LOG_TAG, "We have no internet, enable ConnectivityReceiver!");

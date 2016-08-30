@@ -4,7 +4,6 @@ import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
@@ -17,6 +16,8 @@ import java.net.URLConnection;
 
 /**
  * Created by newglasses on 15/08/2016.
+ * Geofencing turns coordinates into "city" level text
+ * Tutorial: https://www.youtube.com/watch?annotation_id=annotation_2528810665&feature=iv&src_vid=QNb_3QKSmMk&v=66F69bqAups
  */
 public class GPSLocationService extends IntentService {
 
@@ -47,16 +48,6 @@ public class GPSLocationService extends IntentService {
 
         try {
 
-            /*
-            Uri builtOpenNotifyUri = Uri.parse(GPS_LOCATION_BASE_URL).buildUpon()
-                    .appendQueryParameter(GPS_LATLNG_PARAM, lat)
-                    .appendQueryParameter(GPS_API_KEY, key)
-                    .build();
-
-            URL openNotifyURL = new URL (builtOpenNotifyUri.toString());
-
-            */
-
             StringBuilder sb = new StringBuilder();
             sb.append(GPS_LOCATION_BASE_URL)
                     .append(latlng)
@@ -77,8 +68,6 @@ public class GPSLocationService extends IntentService {
         this.sendBroadcast(i);
 
     }
-
-
 
     protected void downloadFile(String theUrl) throws IOException {
 

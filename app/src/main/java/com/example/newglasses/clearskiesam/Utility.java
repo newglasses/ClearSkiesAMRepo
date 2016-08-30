@@ -7,7 +7,8 @@ import java.text.SimpleDateFormat;
 
 /**
  * Created by newglasses on 03/08/2016.
- * CODE TAKEN FROM: https://gist.github.com/udacityandroid/a86d966f3f4105a22ac3#file-utility-java
+ * CODE TAKEN DIRECTLY FROM: https://gist.github.com/udacityandroid/a86d966f3f4105a22ac3#file-utility-java
+ * ClearArrayLists() method not included - developer's own
  */
 public class Utility {
 
@@ -104,9 +105,7 @@ public class Utility {
 
         // DEALING WITH DATA FOR UI DISPLAY
         // CLEAR THE ARRAYLISTS
-        if (ApplicationController.getInstance().getImageArray() != null) {
-            ApplicationController.getInstance().getImageArray().clear();
-        }
+
         if (ApplicationController.getInstance().getTextFirstArray() != null) {
             ApplicationController.getInstance().getTextFirstArray().clear();
         }

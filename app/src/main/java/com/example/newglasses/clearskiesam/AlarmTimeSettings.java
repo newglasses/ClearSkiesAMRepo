@@ -3,12 +3,10 @@ package com.example.newglasses.clearskiesam;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.widget.TimePicker;
-import android.widget.Toast;
 
 /**
  * Created by newglasses on 02/08/2016.
- * DELETE THIS CLASS - IT IS NOT CURRENTLY USED TO DO ANYTHING - UNLESS YOU WANT TO REFACTOR
- * THE SETTINGS ACTIVITY AND THE TIMEPICKER DIALOG
+ * Implements a time set listener for the time picker dialog.
  */
 public class AlarmTimeSettings implements TimePickerDialog.OnTimeSetListener {
 
@@ -26,12 +24,6 @@ public class AlarmTimeSettings implements TimePickerDialog.OnTimeSetListener {
     @Override
     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
 
-        /*
-
-        Toast.makeText(context, "Selected time is hour: " + hourOfDay + " minute: " + minute,
-                Toast.LENGTH_LONG).show();
-
-        */
 
     }
 

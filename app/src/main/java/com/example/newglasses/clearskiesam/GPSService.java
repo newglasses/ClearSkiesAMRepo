@@ -28,17 +28,15 @@ import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.net.URLConnection;
-
 
 /**
  * Created by newglasses on 02/08/2016.
+ * Uses Google API Client and Fused Location Provider to access device coordinates
+ * TODO: Implement runtime permissions
+ * TODO: Deal with failed connections
+ * Code adapted from: https://www.youtube.com/watch?v=QazGb6wJed8
  */
+
 public class GPSService extends IntentService implements LocationListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     // for logging
@@ -47,24 +45,21 @@ public class GPSService extends IntentService implements LocationListener, Googl
     // Used to identify when the IntentService finishes
     public static final String GPS_DONE = "com.example.newglasses.amclearskies.GPS_DONE";
 
+    private static final int MY_PERMISSION_REQUEST_FINE_LOCATION = 101;
+
     SharedPreferences sharedPrefs;
 
-    GoogleApiClient mGoogleApiClient = null;
+    GoogleApiClient mGoogleApiClient;
+
     private String lat, lng;
 
     LocationRequest locationRequest;
-
-    private Handler listHandler;
 
     public final static int MILLISECONDS_PER_SECOND = 1000;
     public final static int FIVE_MINUTE = 60 * 5 * MILLISECONDS_PER_SECOND;
 
     @Override
     protected void onHandleIntent(Intent intent) {
-
-        // check that play services are enabled on the device - see Application class also
-        // code taken from: http://stackoverflow.com/questions/21022297/fused-location-provider-doesnt-seem-to-use-gps-receiver
-
 
         Log.e(LOG_TAG, "GPS Service Started");
 
@@ -73,27 +68,6 @@ public class GPSService extends IntentService implements LocationListener, Googl
             buildGoogleApiClient();
 
             locationRequest = new LocationRequest();
-
-            // handler is used as a manual workaround as some comments on StackOverflow have indicated
-            // locationRequest.setExpirationDuration() & .setExpirationTime()
-            // do not work well
-            // code amended from:  http://stackoverflow.com/questions/16909171/android-location-request-set-expiration-duration-doesnt-work
-
-            /*
-            listHandler = new Handler() {
-                public void handleMessage(Message msg) {
-                    if (msg.what == 0) {
-
-                        //mLocationClient.removeLocationUpdates(MyActivity.this);
-
-                        LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, GPSService.this);
-                        //Location Updates are now removed
-                    }
-                    super.handleMessage(msg);
-                }
-            };
-
-            */
 
             // setting to low power because wifi is required for the app to complete it's work
             // and granular accuracy is not required for it to give valuable results
@@ -109,9 +83,6 @@ public class GPSService extends IntentService implements LocationListener, Googl
 
             // see if any other apps are updating more frequently every 15 seconds
             locationRequest.setFastestInterval(15 * MILLISECONDS_PER_SECOND);
-
-
-
 
         }
 
@@ -152,38 +123,70 @@ public class GPSService extends IntentService implements LocationListener, Googl
 
     private void requestLocationUpdates() {
 
-        /*
-        IN ORDER TO USE THIS METHOD THE DEVICE MUST BE API 23 - ANYTHING LESS AND THE APP CRASHES
-        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
-
-
-        // first check for permissions
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.INTERNET}
-                        , 10);
-            }
-            return;
-        }
-        // this code won't execute IF permissions are not allowed, because in the line above there is return statement.
-        // this specific 'if' implementation is taken from: https://www.youtube.com/watch?v=QNb_3QKSmMk
-        */
-
         // get the gps coords of the device using the location listener
         LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, locationRequest, this);
 
-        //listHandler.sendEmptyMessageDelayed(0, 10000);
-
-        ///// DON'T WANT LAST LOCATION DATA BECAUSE IT COULD BE STALE AND THEREFORE NOT VERY RELIABLE /////
+        // TODO:
+        // Location access permission now required at runtime For API 23 +
+        // The following two if statements check permissions and device OS
+        // Currently it does not deal with getting runtime permissions
+        // Need to work out how to request permissions as it is not possible to do so directly from an IntentService
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                // Access fine location implies coarse too
+                // this.requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, MY_PERMISSION_REQUEST_FINE_LOCATION);
+            } else {
+                // ...
+                // Possible solution: http://stackoverflow.com/questions/30141631/send-location-updates-to-intentservice
+            }
+            return;
+        }
     }
 
-    // code taken from here: http://stackoverflow.com/questions/29861580/locationservices-settingsapi-reset-settings-change-unavailable-flag
-    // Needs fixed and updated to suit requirements of ClearSkies app
-    // Right now I don't think it's doing anything
-    // Also is this only necessary if you are updating an existing app that might already be on someone's phone?
+    @Override
+    public void onLocationChanged(Location location) {
 
+
+        lat = String.valueOf(location.getLatitude());
+
+        lng = String.valueOf(location.getLongitude());
+
+        Log.e(LOG_TAG, "Data from GPSService" + lat + " " + lng);
+
+        sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+        ApplicationController.getInstance().getDataToDisplay().add(lat + " " + lng);
+        sharedPrefs.edit().putString("lat", String.valueOf(location.getLatitude())).apply();
+        sharedPrefs.edit().putString("lng", String.valueOf(location.getLongitude())).apply();
+
+        Log.e(LOG_TAG, "Data from GPSService after added to sharedPrefs" + lat + " " + lng);
+
+        if (withinBounds(location.getLatitude(), location.getLongitude())) {
+            sharedPrefs.edit().putBoolean("withinBounds", true).apply();
+        } else {
+            sharedPrefs.edit().putBoolean("withinBounds", false).apply();
+        }
+
+        //Broadcast an intent back to the ClearSkiesService when work is complete
+        Intent i = new Intent(GPS_DONE);
+        sendBroadcast(i);
+    }
+
+    // Check that the coordinates are within bounds
+    public static boolean withinBounds(double lat, double lng) {
+
+        boolean withinBounds = false;
+
+        if ((lat >= 50.0 && lat <= 60.0) &&
+                (lng >= -9.0 && lng <= 2.0)) {
+            withinBounds = true;
+        }
+        return withinBounds;
+    }
+
+    // TODO: Implement checkLocationSettings() method
+    // code taken from here: http://stackoverflow.com/questions/29861580/locationservices-settingsapi-reset-settings-change-unavailable-flag
     private void checkLocationSettings() {
 
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
@@ -218,57 +221,7 @@ public class GPSService extends IntentService implements LocationListener, Googl
                 }}});
     }
 
-    // checkLocationSettings() code taken from here:
-    // http://stackoverflow.com/questions/29861580/locationservices-settingsapi-reset-settings-change-unavailable-flag
-    // Needs fixed and updated to suit requirements of ClearSkies app
-    // Right now I don't think it's doing anything
-    // Also is this only necessary if you are updating an existing app that might already be on someone's phone?
 
-    @Override
-    public void onLocationChanged(Location location) {
-
-
-        lat = String.valueOf(location.getLatitude());
-
-        lng = String.valueOf(location.getLongitude());
-
-        Log.e(LOG_TAG, "Data from GPSService" + lat + " " + lng);
-
-        sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-        //SharedPreferences.Editor editor = sharedPrefs.edit();
-
-        // ClearSkiesService.dataToDisplay.add(latlng);
-        ApplicationController.getInstance().getDataToDisplay().add(lat + " " + lng);
-        sharedPrefs.edit().putString("lat", String.valueOf(location.getLatitude())).apply();
-        sharedPrefs.edit().putString("lng", String.valueOf(location.getLongitude())).apply();
-
-        Log.e(LOG_TAG, "Data from GPSService after added to sharedPrefs" + lat + " " + lng);
-
-        // Get the coords in text form
-        // coordsToText(this, lat, lng);
-
-        if (withinBounds(location.getLatitude(), location.getLongitude())) {
-            sharedPrefs.edit().putBoolean("withinBounds", true).apply();
-        } else {
-            sharedPrefs.edit().putBoolean("withinBounds", false).apply();
-        }
-
-        //Broadcast an intent back to the ClearSkiesService when work is complete
-        Intent i = new Intent(GPS_DONE);
-        sendBroadcast(i);
-    }
-
-    // Check that the coordinates are within bounds
-    public static boolean withinBounds(double lat, double lng) {
-
-        boolean withinBounds = false;
-
-        if ((lat >= 50.0 && lat <= 60.0) &&
-                (lng >= -9.0 && lng <= 2.0)) {
-            withinBounds = true;
-        }
-        return withinBounds;
-    }
     // Validates resource references inside Android XML files
     public GPSService() {
         super(GPSService.class.getName());

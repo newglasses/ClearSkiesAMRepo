@@ -41,11 +41,12 @@ public class MainActivity extends AppCompatActivity {
 
     private TextView dateView;
     private ListView listView;
-    private boolean mUseEventLayout;
-    // private static final String SELECTED_KEY = "selected_position";
 
+    // Overlay
     private View topLevelLayout;
 
+
+    // TODO: Implement ProgressBar
     protected static ProgressBar progressBar;
 
     @Override
@@ -58,30 +59,30 @@ public class MainActivity extends AppCompatActivity {
 
         dateView = (TextView) findViewById(R.id.list_date);
 
-        progressBar = (ProgressBar) findViewById(R.id.progress_bar);
-
+        // Set up friendly date
         dateView.setText(Utility.getFriendlyDayString(this, System.currentTimeMillis()));
 
-        progressBar.setVisibility(View.GONE);
-
+        // Set up background work
         WakefulIntentService.scheduleAlarms(new DailyListener(), this, false);
 
+        // Set up the ListView adapter
         testBaseCustomAdapter = new CustomAdapter(this,
-                ApplicationController.getInstance().getImageArray(),
                 ApplicationController.getInstance().getTextFirstArray(),
                 ApplicationController.getInstance().getTextSecondArray(),
                 ApplicationController.getInstance().getTextThirdArray(),
                 ApplicationController.getInstance().getStyleArray());
 
-        // idea comes from here: http://www.androidtutorialsworld.com/android-custom-listview-example/
-
         listView = (ListView) findViewById(R.id.listView);
 
         listView.setAdapter(testBaseCustomAdapter);
 
+        // Only display overlay on first use
         if (isFirstTime()) {
             topLevelLayout.setVisibility(View.INVISIBLE);
         }
+
+        progressBar = (ProgressBar) findViewById(R.id.progress_bar);
+        progressBar.setVisibility(View.GONE);
     }
 
     @Override
@@ -120,11 +121,11 @@ public class MainActivity extends AppCompatActivity {
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_refresh) {
             Log.e(LOG_TAG, "Refresh option has been selected");
-            // WakefulIntentService.scheduleAlarms(new DailyListener(), MainActivity.this, false);
+            // Until ConnectivityReceiver is used with the refresh button
             if (isNetworkAvailable()) {
                 Intent clearSkiesIntent = new Intent(this, ClearSkiesService.class);
                 startService(clearSkiesIntent);
-                // TODO: Get the progressBar working
+                // Until ProgressBar is implemented use a toast
                 Toast.makeText(MainActivity.this, "Updating...", Toast.LENGTH_LONG).show();
             } else {
                 ClearSkiesService.noInternet = true;
@@ -136,8 +137,6 @@ public class MainActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
-
-    // error handling saying the @Override is not necessary here
     public void onItemSelected(Uri contentUri) {
             Intent intent = new Intent(this, MainActivity.class)
                     .setData(contentUri);
@@ -153,8 +152,9 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         boolean ranBefore = sharedPrefs.getBoolean("ranBefore", false);
 
-        // for testing/ updating
-        // ranBefore = false;
+        /* FOR TESTING PURPOSES
+        ** ranBefore = false;
+        */
 
         String locationPref = sharedPrefs.getString("locationPref", "Roaming");
         String alertTime = sharedPrefs.getString("timePicker", "20:00");
@@ -224,6 +224,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public boolean isNetworkAvailable() {
+        // CODE TAKEN FROM HERE: http://www.vogella.com/tutorials/AndroidNetworking/article.html
         ConnectivityManager cm = (ConnectivityManager)
                 getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = cm.getActiveNetworkInfo();
@@ -233,5 +234,5 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
         return false;
-    } // CODE TAKEN FROM HERE: http://www.vogella.com/tutorials/AndroidNetworking/article.html
+    }
 }

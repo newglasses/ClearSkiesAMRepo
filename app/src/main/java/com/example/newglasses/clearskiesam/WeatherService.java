@@ -17,6 +17,10 @@ import java.net.URLConnection;
 
 /**
  * Created by newglasses on 02/08/2016.
+ * Accesses the Forecast.io API
+ * Downloads data to local file
+ * Informs the ClearSkiesService via Broadcast when work is complete
+ * Code adapted from: http://www.newthinktank.com/2014/12/make-android-apps-18/
  */
 public class WeatherService extends IntentService {
 
@@ -70,11 +74,8 @@ public class WeatherService extends IntentService {
         final String FORECAST_BASE_URL = "https://api.forecast.io/forecast/";
 
         // when i get the other work into this project these will be defined from there
-        // how to make the api key private???
-        // excluding data blocks from the query that are not required by the app
-        // in the hourly we get hourly forecasts
-        // in the daily we get sunrise and sunset times
-        // don't need the system time to make the query
+        // TODO: Make the API key private
+        // TODO: Exclude "params" data blocks from the query that are not required by the app
 
         String apiKey = "57e606614d55dbee13c97a1736097f91/";
         String separator = ",";
@@ -91,17 +92,6 @@ public class WeatherService extends IntentService {
         String forecastURL = sbForecastURL.toString();
 
         try {
-
-            /*
-            Uri builtWeatherUri = Uri.parse(forecastURL).buildUpon()
-                    .authority("?exclude=[currently,minutely,hourly,alerts,flags]?units=[si]&visibility:")
-                    .build();
-
-            URL weatherURL = new URL (builtWeatherUri.toString());
-
-            Log.e(LOG_TAG, "Built Open Notify URI: " + weatherURL);
-            */
-
             downloadFile(forecastURL);
         } catch (IOException e) {
             e.printStackTrace();

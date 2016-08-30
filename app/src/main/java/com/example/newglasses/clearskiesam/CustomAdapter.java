@@ -8,13 +8,16 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 
 /**
  * Created by newglasses on 11/08/2016.
+ * CustomAdapter that organises the ListViews that populate the UI
+ * Code developed from two sources
+ * Udacity course: https://classroom.udacity.com/courses/ud853/lessons/1623168625/concepts/16677585740923#
+ * ListView example: http://www.androidtutorialsworld.com/android-custom-listview-example/
+ *
  */
 public class CustomAdapter extends BaseAdapter {
 
@@ -34,13 +37,11 @@ public class CustomAdapter extends BaseAdapter {
 
     // Constructor
     public CustomAdapter(MainActivity mainActivity,
-                         ArrayList<String> images,
                          ArrayList<String> textFirst,
                          ArrayList<String> textSecond,
                          ArrayList<String> textThird,
                          ArrayList<String> eventStyle) {
 
-        this.images = images;
         this.textFirst = textFirst;
         this.textSecond = textSecond;
         this.textThird = textThird;
@@ -94,19 +95,10 @@ public class CustomAdapter extends BaseAdapter {
         int layoutId = -1;
         switch (viewType) {
             case VIEW_TYPE_LIST_EVENT: {
-                // Get weather icon
-                //holder.imageView.setImageResource(R.mipmap.ic_launcher);
                 layoutId = R.layout.list_item_event;
-
-                /*
-                viewHolder.imageView.setImageResource(Utility.getArtResourceForWeatherCondition(
-                        cursor.getInt(ForecastFragment.COL_WEATHER_CONDITION_ID)));
-                */
                 break;
             }
             case VIEW_TYPE_LIST_OTHER: {
-                // Get weather icon
-                //holder.imageView.setImageResource(R.mipmap.ic_launcher);
                 layoutId = R.layout.list_item;
                 break;
             }
@@ -119,20 +111,11 @@ public class CustomAdapter extends BaseAdapter {
 
         ViewHolder viewHolder = (ViewHolder) view.getTag();
 
-        //int viewType = getItemViewType(cursor.getInt(1));
         switch (viewType) {
             case VIEW_TYPE_LIST_EVENT: {
-                // Get weather icon
-                // viewHolder.imageView.setImageResource(R.drawable.cs_logo);
-
-                /*
-                viewHolder.imageView.setImageResource(Utility.getArtResourceForWeatherCondition(
-                        cursor.getInt(ForecastFragment.COL_WEATHER_CONDITION_ID)));
-                */
                 break;
             }
             case VIEW_TYPE_LIST_OTHER: {
-                // Get weather icon
                 viewHolder.imageView.setImageResource(R.drawable.cs_smaller);
                 break;
             }
@@ -147,6 +130,7 @@ public class CustomAdapter extends BaseAdapter {
             @Override
             public void onClick(View v) {
                 //Toast.makeText(context, "Clicked item is : " + textFirst.get(position), Toast.LENGTH_LONG).show();
+                // TODO: When clicked the ListItem opens weather or event details
             }
         });
         return view;
@@ -164,7 +148,6 @@ public class CustomAdapter extends BaseAdapter {
     public int getItemViewType(String listType) {
 
         Log.e(LOG_TAG, "List Type: " + listType);
-        //return (position == 0 && mUseListLayout) ? VIEW_TYPE_LIST_EVENT : VIEW_TYPE_LIST_OTHER;
         return ((listType.equals("0")) && mUseListLayout) ? VIEW_TYPE_LIST_EVENT : VIEW_TYPE_LIST_OTHER;
 
     }

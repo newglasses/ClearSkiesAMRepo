@@ -14,6 +14,10 @@ import java.net.URL;
 
 /**
  * Created by newglasses on 02/08/2016.
+ * Accesses the AuroraWatch API
+ * Downloads data to local file
+ * Informs the ClearSkiesService via Broadcast when work is complete
+ * Code adapted from: http://www.newthinktank.com/2014/12/make-android-apps-18/
  */
 public class AuroraWatchService extends IntentService {
 

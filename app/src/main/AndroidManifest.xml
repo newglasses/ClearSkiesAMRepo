@@ -2,20 +2,21 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.newglasses.clearskiesam" >
 
-    <!-- Permission to use AlarmManager -->
+    <!-- CLEAR SKIES PERMISSIONS -->
+
+    <!-- Set an alarm -->
     <uses-permission android:name="com.android.alarm.permission.SET_ALARM" />
-    <!-- Permission to access the internet -->
+    <!-- Access the Internet -->
     <uses-permission android:name="android.permission.INTERNET" />
-    <!-- Permission to access coarse (non-gps) device location data -->
+    <!-- Access coarse location data -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <!-- Access fine location data -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <!-- Permission to Send SMS -->
-    <!--uses-permission android:name="android.permission.SEND_SMS" /-->
     <!-- ActivityManager -->
     <uses-permission android:name="android.permission.INTERACT_ACROSS_USERS_FULL" />
-    <!-- Is there internet connection -->
+    <!-- Access Internet Connectivity State -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <!-- Closing down and restarting the device: CHECK THIS -->
+    <!-- Occurrence of reboot  -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <!-- Wake lock -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
@@ -29,9 +30,7 @@
         android:label="@string/app_name"
         android:theme="@style/ForecastTheme" >
 
-        <!-- Sits under label (in application above) -->
-        <!-- android:backupAgent="ClearSkiesBackUp" -->
-
+        <!-- MAIN ACTIVITY -->
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTask"
@@ -44,15 +43,7 @@
             </intent-filter>
         </activity>
 
-        <activity
-            android:name=".DetailActivity"
-            android:label="@string/title_activity_detail"
-            android:parentActivityName=".MainActivity" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.newglasses.clearskiesam.MainActivity" />
-        </activity>
-
+        <!-- SETTINGS ACTIVITY -->
         <activity
             android:name=".SettingsActivity"
             android:screenOrientation="portrait"
@@ -64,7 +55,7 @@
                 android:value="com.example.newglasses.clearskiesam.MainActivity" />
         </activity>
 
-        <!-- Declare each IntentService -->
+        <!-- INTENT SERVICES -->
 
         <service
             android:name=".ClearSkiesService"
@@ -87,7 +78,7 @@
 
         <service android:name=".BackgroundService" />
 
-        <!-- Declare each Inner Class BroadcastReceiver and it's filters -->
+        <!-- ClearSkiesService INNER CLASS BROADCAST RECEIVERS AND INTENT FILTERS -->
 
         <receiver
             android:name=".ClearSkiesService$GPSRetrievedReceiver"
@@ -183,10 +174,7 @@
             </intent-filter>
         </receiver>
 
-        <!--
-        <meta-data android:name="com.google.android.backup.api_key"
-            android:value="AEdPqrEAAAAINWqm98kj1uXIiOYl9nIMx_BA8b8043XKCACO2Q" />
-        -->
+        <!-- AlarmReceiver BROADCAST RECEIVER AND INTENT FILTER -->
 
         <receiver android:name="com.example.newglasses.clearskiesam.AlarmReceiver" >
             <intent-filter>
@@ -197,6 +185,9 @@
                 android:name="com.example.newglasses.clearskiesam.wakeful"
                 android:resource="@xml/wakeful" />
         </receiver>
+
+        <!-- ConnectivityReceiver BROADCAST RECEIVER AND INTENT FILTER -->
+
         <receiver
             android:name=".ConnectivityReceiver"
             android:enabled="false" >

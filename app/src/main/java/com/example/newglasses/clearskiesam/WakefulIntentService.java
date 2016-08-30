@@ -10,6 +10,9 @@
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
   limitations under the License.
+
+  Code tutorial: https://www.sufficientlysecure.org/2012/05/24/service-daily.html
+  Source code: https://github.com/commonsguy/cwac-wakeful
  */
 
 package com.example.newglasses.clearskiesam;
@@ -59,11 +62,7 @@ abstract public class WakefulIntentService extends IntentService {
 
   public static void scheduleAlarms(AlarmListener listener,
                                     Context ctxt, boolean force) {
-    //SharedPreferences prefs=ctxt.getSharedPreferences(NAME, 0);
-    //long lastAlarm=prefs.getLong(LAST_ALARM, 0);
 
-    //if (lastAlarm == 0 || force || (System.currentTimeMillis() > lastAlarm && System.currentTimeMillis()
-    //        - lastAlarm > listener.getMaxAge(ctxt))) {
       AlarmManager mgr=
           (AlarmManager)ctxt.getSystemService(Context.ALARM_SERVICE);
       Intent i=new Intent(ctxt, AlarmReceiver.class);

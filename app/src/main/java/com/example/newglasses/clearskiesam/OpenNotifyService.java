@@ -18,6 +18,10 @@ import java.net.URLConnection;
 
 /**
  * Created by newglasses on 02/08/2016.
+ * * Accesses the Open Notify API
+ * Downloads data to local file
+ * Informs the ClearSkiesService via Broadcast when work is complete
+ * Code adapted from: http://www.newthinktank.com/2014/12/make-android-apps-18/
  */
 public class OpenNotifyService extends IntentService {
 
@@ -44,8 +48,6 @@ public class OpenNotifyService extends IntentService {
         String lat = sharedPrefs.getString("lat", "lat error");
         String lng = sharedPrefs.getString("lng", "lng error");
 
-        //String openNotifyURL = OPEN_NOTIFY_BASE_URL + "lat=" + lat +"&lon=" + lng;
-
         try {
 
             Uri builtOpenNotifyUri = Uri.parse(OPEN_NOTIFY_BASE_URL).buildUpon()
@@ -54,7 +56,6 @@ public class OpenNotifyService extends IntentService {
                     .build();
 
             URL openNotifyURL = new URL (builtOpenNotifyUri.toString());
-
 
             Log.e(LOG_TAG, "Built Open Notify URI: " + openNotifyURL);
 
@@ -84,9 +85,6 @@ public class OpenNotifyService extends IntentService {
             // Create an output stream to write data to a file (private to everyone except our app)
             FileOutputStream outputStream = openFileOutput(fileName, Context.MODE_PRIVATE);
 
-            // Get File
-            //URL fileURL = new URL(theURL);
-
             // Create a connection we can use to read data from a url
             URLConnection urlConnection = theURL.openConnection();
 
@@ -105,11 +103,8 @@ public class OpenNotifyService extends IntentService {
                     // Write the data received to our file
                     outputStream.write(buffer, 0, bufferLength);
                 }
-
                 // Close our connection to our file
                 outputStream.close();
-
-                // Get File Done
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
