@@ -35,14 +35,17 @@ import android.util.Log;
  */
 public class ConnectivityReceiver extends BroadcastReceiver {
 
+    // for logging
+    private static final String LOG_TAG = ConnectivityReceiver.class.getSimpleName();
+
     @Override
     public void onReceive(Context context, Intent intent) {
         if (intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
-            Log.d("ConnectivityReceiver", "ConnectivityReceiver invoked...");
+            Log.e(LOG_TAG, "ConnectivityReceiver invoked...");
 
             // only when background update is enabled in prefs
             if (PreferenceHelper.getUpdateCheckDaily(context)) {
-                Log.d("ConnectivityReceiver", "Update check daily is enabled!");
+                Log.e(LOG_TAG, "Update check daily is enabled!");
 
                 boolean noConnectivity = intent.getBooleanExtra(
                         ConnectivityManager.EXTRA_NO_CONNECTIVITY, false);
@@ -61,7 +64,7 @@ public class ConnectivityReceiver extends BroadcastReceiver {
                         // if we have mobile or wifi connectivity...
                         if (((netInfo.getType() == ConnectivityManager.TYPE_MOBILE) && updateOnlyOnWifi == false)
                                 || (netInfo.getType() == ConnectivityManager.TYPE_WIFI)) {
-                            Log.d("ConnectivityReceiver", "We have internet, start update check and disable receiver!");
+                            Log.e(LOG_TAG, "We have internet, start update check and disable receiver!");
 
                             // Start service with wakelock by using WakefulIntentService
                             Intent backgroundIntent = new Intent(context, BackgroundService.class);

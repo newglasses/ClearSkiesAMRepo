@@ -92,7 +92,7 @@ public class ClearSkiesService extends IntentService {
     private static SharedPreferences sharedPrefs;
     // SharedPref variables
     private static String locationPref, alarmPref;
-    private static boolean issPref, auroraPref;
+    private static boolean issPref, auroraPref, demoPref;
 
     private static final String NEXT_UPDATE = "NEXT UPDATE";
 
@@ -117,6 +117,10 @@ public class ClearSkiesService extends IntentService {
         issPref = sharedPrefs.getBoolean("iss", true);
         Log.e(LOG_TAG, "issPref: " + issPref);
 
+        // Check demo pref
+        demoPref = sharedPrefs.getBoolean("demo", false);
+        Log.e(LOG_TAG, "demoPref: " + demoPref);
+
         // If location pref is roaming OR default (roaming), then start the GPS Service
         if (locationPref.equals("1") || locationPref.equals("-1")) {
 
@@ -126,7 +130,7 @@ public class ClearSkiesService extends IntentService {
             /* FOR TESTING PURPOSES:
             ** Log.e(LOG_TAG, "Out of Bounds - Device currently not in the UK");
             ** Intent i = new Intent(OUT_OF_RANGE);
-            ** sendBroadcast(i);8
+            ** sendBroadcast(i);
             */
 
         // If location is fixed ** THIS IS NOT CURRENTLY AN OPTION **
@@ -245,20 +249,31 @@ public class ClearSkiesService extends IntentService {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            // FOR DEMO MODE
+            if (demoPref) {
+                Log.e(LOG_TAG, "IN DEMO MODE");
+                // update UI with successful ISS regardless of weather result
+                sharedPrefs.edit().putString("onForecast", "1471558560").apply();
+                sharedPrefs.edit().putInt("weatherTier", 0).apply();
+                Intent i = new Intent(ISS);
+                context.sendBroadcast(i);
+                // raise a notification regardless of weather result
+                Intent iN = new Intent(MAKE_NOTIFICATION);
+                context.sendBroadcast(iN);
 
-            if (weatherSuccess) {
-                if (auroraPref){
-                    Log.e(LOG_TAG, "Aurora pref is: " + auroraPref);
-                    startAuroraWatchService(context);
-                } else if (issPref) {
-                    Log.e(LOG_TAG, "ISS pref is: " + issPref);
-                    startOpenNotifyService(context);
-                } else {
-                    Log.e(LOG_TAG, "No events selected in prefs");
-                    // end the service and upate the UI
-                    Intent i = new Intent(NOTHING_TO_DECLARE);
-                    context.sendBroadcast(i);
-                }
+            } else if (weatherSuccess) {
+                    if (auroraPref){
+                        Log.e(LOG_TAG, "Aurora pref is: " + auroraPref);
+                        startAuroraWatchService(context);
+                    } else if (issPref) {
+                        Log.e(LOG_TAG, "ISS pref is: " + issPref);
+                        startOpenNotifyService(context);
+                    } else {
+                        Log.e(LOG_TAG, "No events selected in prefs");
+                        // end the service and upate the UI
+                        Intent i = new Intent(NOTHING_TO_DECLARE);
+                        context.sendBroadcast(i);
+                    }
 
             } else {
                 Log.e(LOG_TAG, "No Clear Skies or No Events Selected");
@@ -294,6 +309,8 @@ public class ClearSkiesService extends IntentService {
             issPref = sharedPrefs.getBoolean("iss", true);
 
             auroraSuccess = parseAurora(context);
+            // TESTING:
+            // auroraSuccess = true;
             Log.e(LOG_TAG, "Aurora result success = " + auroraSuccess);
 
             if(issPref) {
@@ -1000,6 +1017,7 @@ public class ClearSkiesService extends IntentService {
             if (auroraForecast.equals("No significant activity")) {
                 Log.e(LOG_TAG, "Nothing to show: " + auroraForecast);
                 auroraSuccess = false;
+                sharedPrefs.edit().putString("auroraForecast", auroraForecast).apply();
 
                 /* FOR TESTING PURPOSES:
                 ** sharedPrefs.edit().putString("auroraForecast", auroraForecast).apply();
@@ -1221,10 +1239,10 @@ public class ClearSkiesService extends IntentService {
         sharedPrefs.edit().putLong("sunriseTom", sunriseTom).apply();
         sharedPrefs.edit().putString("cloudCover", String.valueOf(cloudCoverPercent)).apply();
         sharedPrefs.edit().putString("visibility", String.valueOf(visibilityMiles)).apply();
-        sharedPrefs.edit().putInt("weatherTier", weatherTier);
+        sharedPrefs.edit().putInt("weatherTier", weatherTier).apply();
 
         ApplicationController.getInstance().getDataToDisplay()
-                .add("Weather Tier: "+ weatherTier + ", " + weatherColour);
+                .add("Weather Tier: " + weatherTier + ", " + weatherColour);
 
         return weatherSuccess;
     }

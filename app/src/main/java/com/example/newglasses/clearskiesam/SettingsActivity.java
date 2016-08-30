@@ -60,8 +60,14 @@ public class SettingsActivity extends PreferenceActivity
 
         // Even though this method is deprecated it is still the best to use
         // because we are targeting devices as early as Gingerbread
-        // taken from Android course
+        // taken from Udacity course
         addPreferencesFromResource(R.xml.pref_general);
+
+        if (findPreference(getString(R.string.pref_time_picker_key)).equals(null)) {
+            bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_time_picker_default)));
+        } else {
+            bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_time_picker_key)));
+        }
 
         if (findPreference(getString(R.string.pref_gps_key)).equals(null)) {
             bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_gps_default)));

@@ -92,14 +92,14 @@ public class DailyListener implements WakefulIntentService.AlarmListener {
             // if we have mobile or wifi connectivity...
             if (((netInfo.getType() == ConnectivityManager.TYPE_MOBILE) && updateOnlyOnWifi == false)
                     || (netInfo.getType() == ConnectivityManager.TYPE_WIFI)) {
-                Log.d(LOG_TAG, "We have internet, start update check directly now!");
+                Log.e(LOG_TAG, "We have internet, start update check directly now!");
 
                 Intent backgroundIntent = new Intent(context, BackgroundService.class);
                 WakefulIntentService.sendWakefulWork(context, backgroundIntent);
 
 
             } else {
-                Log.d(LOG_TAG, "We have no internet, enable ConnectivityReceiver!");
+                Log.e(LOG_TAG, "We have no internet, enable ConnectivityReceiver!");
 
                 // enable receiver to schedule update when internet is available!
                 ConnectivityReceiver.enableReceiver(context);
@@ -109,7 +109,7 @@ public class DailyListener implements WakefulIntentService.AlarmListener {
                 context.sendBroadcast(i);
             }
         } else {
-            Log.d(LOG_TAG, "We have no internet, enable ConnectivityReceiver!");
+            Log.e(LOG_TAG, "We have no internet, enable ConnectivityReceiver!");
             // enable receiver to schedule update when internet is available!
             ConnectivityReceiver.enableReceiver(context);
             // AlertFlag and update UI

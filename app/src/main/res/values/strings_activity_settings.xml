@@ -19,6 +19,7 @@
     <string name="pref_title_define_location">Where</string>
     <string name="pref_title_define_events">What</string>
     <string name="pref_title_define_other">Other</string>
+    <string name="pref_title_demo">Demo</string>
 
     <string-array name="pref_gps_list_titles">
         <item>Roaming</item>

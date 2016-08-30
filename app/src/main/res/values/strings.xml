@@ -27,6 +27,11 @@
     <string name="pref_cancel_key">cancel</string>
     <string name="pref_cancel_label">Cancel Clear Skies Service</string>
 
+    <string name="pref_demo_label">Demo</string>
+    <string name="pref_demo_key" translatable="false">demo</string>
+    <string name="pref_demo_default">false</string>
+
+
     <!-- Date label when displaying today's weather forecast [CHAR LIMIT=20] -->
     <string name="today">Today</string>
 
