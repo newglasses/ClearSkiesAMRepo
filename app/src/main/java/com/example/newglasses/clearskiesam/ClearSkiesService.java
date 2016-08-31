@@ -1120,6 +1120,7 @@ public class ClearSkiesService extends IntentService {
         // find out current sunset time
         sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
         long sunset = sharedPrefs.getLong("sunsetTonight", 00000L);
+        long sunriseT = sharedPrefs.getLong("sunriseTom", 00000L);
 
         Log.e(LOG_TAG, "Accessed sunsetTime from sharedPrefs: " + String.valueOf(sunset));
 
@@ -1148,7 +1149,9 @@ public class ClearSkiesService extends IntentService {
             Log.e(LOG_TAG, "risetimeDate: " + risetimeDate);
             String risetimeDf = df.format(risetimeDate);
             Log.e(LOG_TAG, "risetimeDf: " + risetimeDf);
-            if (risetimeDf.equals(todayDf) && (passes.get(i).getLong("risetime") > sunset)) {
+            // only want results relevant to today and between the hours of sunset & sunrise
+            if ((risetimeDf.equals(todayDf) && (passes.get(i).getLong("risetime") > sunset) &&
+                    (passes.get(i).getLong("risetime") < sunriseT))) {
 
                 Log.e(LOG_TAG, "pass df: " + sunsetDf + " today df: " + todayDf);
                 Log.e(LOG_TAG, "sunset: " + sunset + " risetime: " + risetime);
